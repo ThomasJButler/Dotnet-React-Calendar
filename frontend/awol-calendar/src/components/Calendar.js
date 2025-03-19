@@ -121,7 +121,17 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
    * @param {Date} date - The selected date
    */
   const handleDateClick = (date) => {
+    // Select the date first
     onDateSelect(date);
+    
+    // If it's a current month date, also show the add event option
+    // This makes the UI flow smoother - click a date, get the option to add event
+    if (date.getMonth() === currentDate.getMonth()) {
+      // Add small delay to ensure date selection is registered first
+      setTimeout(() => {
+        onAddEvent(date);
+      }, 50);
+    }
   };
 
   /**

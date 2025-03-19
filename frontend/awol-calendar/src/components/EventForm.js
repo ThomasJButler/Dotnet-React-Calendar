@@ -8,7 +8,8 @@ import {
   DialogTitle,
   FormControl,
   FormHelperText,
-  Box
+  Box,
+  Alert
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
@@ -94,62 +95,101 @@ const EventForm = ({ open, handleClose, event, isEditing }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * Handle form submission
-   * @param {Event} e - Form submit event
-   */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+// State for submission feedback
+const [feedback, setFeedback] = useState({ type: '', message: '' });
+
+/**
+ * Handle form submission
+ * @param {Event} e - Form submit event
+ */
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Reset feedback
+  setFeedback({ type: '', message: '' });
+  
+  if (!validateForm()) {
+    return;
+  }
+  
+  setIsSubmitting(true);
+  
+  try {
+    // Format time as string (HH:MM)
+    const formattedTime = time ? 
+      `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}` : 
+      '';
     
-    if (!validateForm()) {
-      return;
-    }
+    const eventData = {
+      title,
+      date: date.toISOString(),
+      time: formattedTime,
+      description
+    };
     
-    setIsSubmitting(true);
-    
-    try {
-      // Format time as string (HH:MM)
-      const formattedTime = time ? 
-        `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}` : 
-        '';
-      
-      const eventData = {
-        title,
-        date: date.toISOString(),
-        time: formattedTime,
-        description
-      };
-      
-      if (isEditing && event) {
-        // Include ID when updating
-        await updateEvent(event.id, { ...eventData, id: event.id });
-      } else {
-        await addEvent(eventData);
+    if (isEditing && event) {
+      // Include ID when updating
+      const updatedEvent = await updateEvent(event.id, { ...eventData, id: event.id });
+      if (updatedEvent) {
+        setFeedback({ 
+          type: 'success', 
+          message: 'Event updated successfully!' 
+        });
+        // Close the form after a brief delay to show feedback
+        setTimeout(() => {
+          handleClose();
+          resetForm();
+        }, 1500);
       }
-      
-      handleClose();
-      resetForm();
-    } catch (error) {
-      console.error('Error submitting event:', error);
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      const newEvent = await addEvent(eventData);
+      if (newEvent) {
+        setFeedback({ 
+          type: 'success', 
+          message: 'Event added successfully!' 
+        });
+        // Close the form after a brief delay to show feedback
+        setTimeout(() => {
+          handleClose();
+          resetForm();
+        }, 1500);
+      }
     }
-  };
+  } catch (error) {
+    console.error('Error submitting event:', error);
+    setFeedback({ 
+      type: 'error', 
+      message: 'Failed to save event. Please try again.' 
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   /**
    * Handle dialog close
    */
-  const onClose = () => {
-    resetForm();
-    handleClose();
-  };
+const onClose = () => {
+  resetForm();
+  setFeedback({ type: '', message: '' });
+  handleClose();
+};
 
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{isEditing ? 'Edit Event' : 'Add New Event'}</DialogTitle>
-      <form onSubmit={handleSubmit}>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+return (
+  <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <DialogTitle>{isEditing ? 'Edit Event' : 'Add New Event'}</DialogTitle>
+    <form onSubmit={handleSubmit}>
+      <DialogContent>
+        {/* Feedback alert */}
+        {feedback.message && (
+          <Box sx={{ mb: 2 }}>
+            <Alert severity={feedback.type === 'success' ? 'success' : 'error'}>
+              {feedback.message}
+            </Alert>
+          </Box>
+        )}
+        
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <FormControl error={!!errors.title}>
               <TextField
                 label="Title"
