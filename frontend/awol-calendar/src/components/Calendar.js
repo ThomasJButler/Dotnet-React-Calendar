@@ -5,12 +5,14 @@ import {
   Typography, 
   IconButton, 
   Box,
-  Badge
+  Badge,
+  useTheme
 } from '@mui/material';
 import { 
   ChevronLeft as ChevronLeftIcon, 
   ChevronRight as ChevronRightIcon,
-  Add as AddIcon
+  Add as AddIcon,
+  CalendarMonth as CalendarMonthIcon
 } from '@mui/icons-material';
 import { useEvents } from '../context/EventContext';
 
@@ -21,8 +23,10 @@ import { useEvents } from '../context/EventContext';
  */
 const Calendar = ({ onDateSelect, onAddEvent }) => {
   const { events } = useEvents();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date()); // Default to current date
   const [calendarDays, setCalendarDays] = useState([]);
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
 
   /**
    * Generate calendar days for the current month
@@ -97,6 +101,13 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
     setCalendarDays(days);
   }, [currentDate, events]);
 
+  // Initialize calendar to today's date on first load
+  useEffect(() => {
+    // Ensure we start with today's date when component mounts
+    const today = new Date();
+    setCurrentDate(today);
+  }, []);
+
   // Generate calendar days when the month changes
   useEffect(() => {
     generateCalendarDays();
@@ -121,7 +132,18 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
    * @param {Date} date - The selected date
    */
   const handleDateClick = (date) => {
+    // Select the date first
     onDateSelect(date);
+  };
+  
+  /**
+   * Handle add event button click
+   * @param {Date} date - The date for the new event
+   * @param {Event} e - Click event
+   */
+  const handleAddEventClick = (date, e) => {
+    e.stopPropagation();
+    onAddEvent(date);
   };
 
   /**
@@ -133,8 +155,33 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
     return currentDate.toLocaleDateString('en-GB', options);
   };
 
+  // Go to today's date
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
   // Day names for the calendar header
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Function to get event indicator color based on priority (for light mode traffic light system)
+  const getEventColor = (day) => {
+    if (isDarkMode) {
+      return theme.palette.primary.light;
+    }
+    
+    // Count the number of events on this day to determine "busyness"
+    const dateString = day.date.toISOString().split('T')[0];
+    const eventsOnDay = events.filter(event => {
+      const eventDateString = new Date(event.date).toISOString().split('T')[0];
+      return eventDateString === dateString;
+    });
+    
+    // Traffic light system - green, amber, red based on number of events
+    if (eventsOnDay.length === 0) return theme.palette.primary.main;
+    if (eventsOnDay.length <= 1) return '#4caf50'; // Green
+    if (eventsOnDay.length <= 3) return '#ff9800'; // Amber
+    return '#f44336'; // Red - busy day
+  };
 
   return (
     <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
@@ -142,15 +189,25 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
         <IconButton onClick={handlePrevMonth} aria-label="previous month">
           <ChevronLeftIcon />
         </IconButton>
-        <Typography variant="h6" component="h2">
-          {formatMonthYear()}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton 
+            onClick={goToToday} 
+            size="small" 
+            sx={{ mr: 1 }}
+            aria-label="go to today"
+          >
+            <CalendarMonthIcon fontSize="small" />
+          </IconButton>
+          <Typography variant="h6" component="h2" onClick={goToToday} sx={{ cursor: 'pointer' }}>
+            {formatMonthYear()}
+          </Typography>
+        </Box>
         <IconButton onClick={handleNextMonth} aria-label="next month">
           <ChevronRightIcon />
         </IconButton>
       </Box>
       
-      <Grid container spacing={1}>
+      <Grid container spacing={1} className="calendar-grid">
         {/* Calendar header with day names */}
         {dayNames.map(day => (
           <Grid item xs={12/7} key={day}>
@@ -172,16 +229,22 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
               sx={{
                 p: 1,
                 height: '60px',
-                border: '1px solid #eee',
+                border: isDarkMode ? '1px solid #333' : '1px solid #eee',
                 borderRadius: 1,
-                backgroundColor: day.isCurrentMonth ? 'white' : '#f5f5f5',
+                backgroundColor: day.isCurrentMonth 
+                  ? (isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'white') 
+                  : (isDarkMode ? 'rgba(0, 0, 0, 0.2)' : '#f5f5f5'),
                 opacity: day.isCurrentMonth ? 1 : 0.7,
                 cursor: 'pointer',
                 position: 'relative',
                 '&:hover': {
-                  backgroundColor: '#e3f2fd',
+                  backgroundColor: isDarkMode 
+                    ? 'rgba(144, 202, 249, 0.15)' 
+                    : 'rgba(25, 118, 210, 0.1)',
                 },
+                transition: 'background-color 0.2s',
               }}
+              className="calendar-day"
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography
@@ -204,10 +267,7 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                 {day.isCurrentMonth && (
                   <IconButton
                     size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddEvent(day.date);
-                    }}
+                    onClick={(e) => handleAddEventClick(day.date, e)}
                     sx={{ 
                       p: 0, 
                       opacity: 0,
@@ -215,16 +275,16 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                       '.MuiSvgIcon-root': { fontSize: '0.875rem' }
                     }}
                     className="add-event-button"
+                    aria-label="add event"
                   >
                     <AddIcon fontSize="small" />
                   </IconButton>
                 )}
               </Box>
               
-              {/* Event indicator */}
+              {/* Event indicator with traffic light colors */}
               {day.hasEvents && (
                 <Badge
-                  color="primary"
                   variant="dot"
                   sx={{
                     position: 'absolute',
@@ -235,6 +295,7 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                       height: 8,
                       width: 8,
                       borderRadius: '50%',
+                      backgroundColor: getEventColor(day),
                     }
                   }}
                 />

@@ -1,49 +1,122 @@
-/* General styles */
+/* Modern UI Styling */
+:root {
+  --primary-light: #1976d2;
+  --secondary-light: #dc004e;
+  --background-light: #f5f5f5;
+  --paper-light: #ffffff;
+  --text-light: #333333;
+  --border-light: #eeeeee;
+  
+  --primary-dark: #90caf9;
+  --secondary-dark: #f48fb1;
+  --background-dark: #121212;
+  --paper-dark: #1e1e1e;
+  --text-dark: #f5f5f5;
+  --border-dark: #333333;
+
+  --transition-speed: 0.3s;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --box-shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  background-color: #f5f5f5;
+  transition: background-color var(--transition-speed) ease;
 }
 
-/* Calendar day hover effect */
+/* Enhanced Paper Components */
+.MuiPaper-root {
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--box-shadow) !important;
+  transition: all var(--transition-speed) ease !important;
+}
+
+.MuiPaper-root:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Calendar styling enhancements */
+.calendar-day {
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
 .calendar-day:hover {
-  background-color: #e3f2fd;
+  background-color: rgba(25, 118, 210, 0.1) !important;
   cursor: pointer;
+  transform: scale(1.02);
 }
 
-/* Calendar day with events */
-.calendar-day-with-events {
-  position: relative;
+/* Custom styles for dark mode calendar days */
+.dark-mode .calendar-day {
+  border-color: var(--border-dark) !important;
 }
 
-/* Event indicator dot */
+.dark-mode .calendar-day:hover {
+  background-color: rgba(144, 202, 249, 0.15) !important;
+}
+
+/* Event indicator styling */
 .event-indicator {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #1976d2;
   position: absolute;
   bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-}
-
-/* Current day highlight */
-.current-day {
-  font-weight: bold;
-  color: #1976d2;
-}
-
-/* Event list item */
-.event-list-item {
-  border-left: 4px solid #1976d2;
-  margin-bottom: 8px;
   transition: all 0.2s ease;
 }
 
+/* Event list enhancements */
+.event-list-item {
+  border-left: 4px solid var(--primary-light);
+  margin-bottom: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  padding: 8px;
+}
+
 .event-list-item:hover {
-  background-color: #f5f5f5;
+  transform: translateX(4px);
+}
+
+.dark-mode .event-list-item {
+  border-left: 4px solid var(--primary-dark);
+}
+
+/* Button enhancements */
+.MuiButton-root {
+  border-radius: 20px !important;
+  text-transform: none !important;
+  padding: 6px 16px !important;
+  transition: all 0.2s ease !important;
+}
+
+.MuiButton-root:hover {
+  transform: translateY(-2px);
+}
+
+/* Form controls */
+.MuiFormControl-root {
+  margin-bottom: 16px !important;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: var(--border-radius) !important;
+}
+
+/* Add event button animation */
+.add-event-button {
+  transition: all 0.3s ease !important;
+}
+
+.add-event-button:hover {
+  transform: rotate(90deg);
 }
 
 /* Responsive adjustments */
@@ -51,4 +124,50 @@ body {
   .calendar-container {
     margin-bottom: 24px;
   }
+  
+  .MuiContainer-root {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }

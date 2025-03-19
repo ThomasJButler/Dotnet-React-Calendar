@@ -31,6 +31,15 @@ namespace AWOLCalendarAPI.Endpoints
         public override async Task HandleAsync(CreateEventRequest req, CancellationToken ct)
         {
             var newEvent = req.ToEvent();
+            
+            // Check for overlapping events
+            if (_eventService.DoesEventOverlap(newEvent))
+            {
+                AddError("Event overlaps with an existing event");
+                await SendErrorsAsync(400, cancellation: ct);
+                return;
+            }
+            
             _eventService.AddEvent(newEvent);
 
             await SendCreatedAtAsync<GetEventByIdEndpoint>(
