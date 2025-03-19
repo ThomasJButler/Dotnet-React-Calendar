@@ -9,6 +9,10 @@ builder.Services.AddSingleton<EventService>(); // Register Service
 
 var app = builder.Build();
 
+// Get the EventService and initialize with sample data
+var eventService = app.Services.GetRequiredService<EventService>();
+SampleDataService.InitializeEvents(eventService);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
