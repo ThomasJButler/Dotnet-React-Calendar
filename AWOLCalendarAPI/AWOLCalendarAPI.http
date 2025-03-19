@@ -1,0 +1,6 @@
+@AWOLCalendarAPI_HostAddress = http://localhost:5191
+
+GET {{AWOLCalendarAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
