@@ -1,6 +1,33 @@
-@AWOLCalendarAPI_HostAddress = http://localhost:5191
+@baseUrl = https://localhost:7188/api
 
-GET {{AWOLCalendarAPI_HostAddress}}/weatherforecast/
-Accept: application/json
+### Get all events
+GET {{baseUrl}}/events
 
-###
+### Get event by ID
+GET {{baseUrl}}/events/1
+
+### Create a new event
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "title": "New Event",
+  "date": "2025-04-01T00:00:00",
+  "time": "2:00 PM",
+  "description": "This is a new event created via API"
+}
+
+### Update an event
+PUT {{baseUrl}}/events/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Updated Team Meeting",
+  "date": "2025-03-20T00:00:00",
+  "time": "11:00 AM",
+  "description": "Updated weekly team sync-up meeting"
+}
+
+### Delete an event
+DELETE {{baseUrl}}/events/3
