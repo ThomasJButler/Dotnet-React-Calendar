@@ -203,7 +203,8 @@ function App() {
             open={eventFormOpen} 
             handleClose={handleCloseEventForm} 
             event={currentEvent} 
-            isEditing={isEditing} 
+            isEditing={isEditing}
+            selectedDate={selectedDate}
           />
         </Container>
       </EventProvider>

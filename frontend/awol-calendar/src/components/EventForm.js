@@ -42,7 +42,7 @@ const formatDateUK = (date) => {
  * @param {Object} props - Component props
  * @returns {JSX.Element} EventForm component
  */
-const EventForm = ({ open, handleClose, event, isEditing }) => {
+const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
   // Get event context functions
   const { addEvent, updateEvent } = useEvents();
   
@@ -57,9 +57,10 @@ const EventForm = ({ open, handleClose, event, isEditing }) => {
   const [yearPickerYear, setYearPickerYear] = useState(new Date().getFullYear());
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Set form values when editing an existing event
+  // Set form values when editing an existing event or opening form for new event
   useEffect(() => {
     if (isEditing && event) {
+      // When editing an existing event
       setTitle(event.title || '');
       
       // Parse date from string if needed
@@ -82,10 +83,16 @@ const EventForm = ({ open, handleClose, event, isEditing }) => {
       
       setDescription(event.description || '');
     } else {
-      // Reset form for new event
+      // When adding a new event
       resetForm();
+      
+      // Use the selected date from calendar if available
+      if (selectedDate) {
+        setDate(selectedDate);
+        setYearPickerYear(selectedDate.getFullYear());
+      }
     }
-  }, [isEditing, event, open]);
+  }, [isEditing, event, selectedDate, open]);
 
   /**
    * Reset form fields to default values
