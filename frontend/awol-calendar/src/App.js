@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Container, Typography, Box, Button, AppBar, Toolbar, CssBaseline, IconButton, useMediaQuery } from '@mui/material';
+import { Container, Typography, Box, Button, AppBar, Toolbar, CssBaseline, IconButton, useMediaQuery, Divider } from '@mui/material';
 import { Add as AddIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon } from '@mui/icons-material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Calendar from './components/Calendar';
 import EventList from './components/EventList';
 import EventForm from './components/EventForm';
+import FreeTimeChart from './components/FreeTimeChart';
 import { EventProvider } from './context/EventContext';
 import { format } from 'date-fns';
 import { enGB } from 'date-fns/locale';
@@ -49,19 +50,43 @@ function App() {
       palette: {
         mode: darkMode ? 'dark' : 'light',
         primary: {
-          main: darkMode ? '#90caf9' : '#1976d2',
+          main: darkMode ? '#90caf9' : '#2e7d32', // Green for light mode
+          light: darkMode ? '#e3f2fd' : '#81c784', // Light green
+          dark: darkMode ? '#42a5f5' : '#1b5e20',  // Dark green
         },
         secondary: {
-          main: darkMode ? '#f48fb1' : '#dc004e',
+          main: darkMode ? '#f48fb1' : '#c2185b',  // Pink-based
+          light: darkMode ? '#fce4ec' : '#f8bbd0', 
+          dark: darkMode ? '#f06292' : '#880e4f',
         },
         background: {
-          default: darkMode ? '#121212' : '#f5f5f5',
-          paper: darkMode ? '#1e1e1e' : '#ffffff',
+          default: darkMode ? '#121212' : '#f8f5f0', // Warmer off-white
+          paper: darkMode ? '#1e1e1e' : '#fefefe',   // Softer white
+        },
+        text: {
+          primary: darkMode ? '#ffffff' : '#33332d',  // Softer black
+          secondary: darkMode ? '#9e9e9e' : '#5f5f58' // Softer gray
         }
       },
       typography: {
         fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       },
+      components: {
+        MuiCssBaseline: {
+          styleOverrides: {
+            body: {
+              transition: 'background-color 0.3s ease, color 0.3s ease' // Smoother transitions
+            }
+          }
+        },
+        MuiPaper: {
+          styleOverrides: {
+            root: {
+              transition: 'background-color 0.3s ease'
+            }
+          }
+        }
+      }
     }), [darkMode]);
 
   // Toggle dark mode
@@ -145,14 +170,6 @@ function App() {
           {/* Layout changes for mobile - show date and events above calendar */}
           {isMobile ? (
             <>
-              {/* Selected date header */}
-              <Typography 
-                variant="h5" 
-                component="h2" 
-                sx={{ mb: 2, fontWeight: 'medium' }}
-              >
-                {formatDateUK(selectedDate)}
-              </Typography>
               
               {/* Event list section */}
               <Box sx={{ mb: 3 }}>
@@ -169,6 +186,11 @@ function App() {
                   onAddEvent={handleAddEvent} 
                 />
               </Box>
+              
+              {/* Free Time Chart (mobile) */}
+              <Box sx={{ mt: 3 }}>
+                <FreeTimeChart selectedDate={selectedDate} />
+              </Box>
             </>
           ) : (
             /* Desktop layout - calendar beside event list */
@@ -181,19 +203,19 @@ function App() {
                 />
               </Box>
               
-              {/* Event list section */}
-              <Box sx={{ flex: 1 }}>
-                <Typography 
-                  variant="h5" 
-                  component="h2" 
-                  sx={{ mb: 2, fontWeight: 'medium' }}
-                >
-                  {formatDateUK(selectedDate)}
-                </Typography>
-                <EventList 
-                  selectedDate={selectedDate} 
-                  onEditEvent={handleEditEvent} 
-                />
+              {/* Event list and Free Time Chart section */}
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box>
+                  <EventList 
+                    selectedDate={selectedDate} 
+                    onEditEvent={handleEditEvent} 
+                  />
+                </Box>
+                
+                {/* Free Time Chart (desktop) */}
+                <Box>
+                  <FreeTimeChart selectedDate={selectedDate} />
+                </Box>
               </Box>
             </Box>
           )}

@@ -13,6 +13,9 @@ namespace AWOLCalendarAPI.Models.Requests
         
         public string Time { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        
+        // Duration in minutes (default to 60 minutes / 1 hour)
+        public int Duration { get; set; } = 60;
 
         public Event ToEvent()
         {
@@ -25,7 +28,8 @@ namespace AWOLCalendarAPI.Models.Requests
                 Title = Title,
                 Date = date,
                 Time = Time,
-                Description = Description
+                Description = Description,
+                Duration = Duration
             };
         }
     }

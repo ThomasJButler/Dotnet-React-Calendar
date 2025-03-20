@@ -171,12 +171,14 @@ const EventService = {
       const eventDate = new Date(eventData.date);
       const [hours, minutes] = eventData.time.split(':').map(num => parseInt(num, 10));
       
-      // Create Date objects for start and end time (assuming 1 hour duration for simplicity)
+      // Create Date objects for start and end time using the event's duration
       const eventStart = new Date(eventDate);
       eventStart.setHours(hours, minutes, 0, 0);
       
+      // Use the event duration (in minutes) or default to 60 minutes
+      const durationMinutes = eventData.duration || 60;
       const eventEnd = new Date(eventStart);
-      eventEnd.setHours(eventStart.getHours() + 1);
+      eventEnd.setMinutes(eventStart.getMinutes() + durationMinutes);
       
       // Check if any existing event overlaps with this one
       return allEvents.some(existingEvent => {
@@ -193,8 +195,10 @@ const EventService = {
         const existingStart = new Date(existingDate);
         existingStart.setHours(existingHours, existingMinutes, 0, 0);
         
+        // Use the existing event's duration (in minutes) or default to 60 minutes
+        const existingDuration = existingEvent.duration || 60;
         const existingEnd = new Date(existingStart);
-        existingEnd.setHours(existingStart.getHours() + 1);
+        existingEnd.setMinutes(existingStart.getMinutes() + existingDuration);
         
         // Check for overlap: existingStart < eventEnd AND existingEnd > eventStart
         return existingStart < eventEnd && existingEnd > eventStart;

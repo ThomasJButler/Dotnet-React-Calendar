@@ -15,24 +15,27 @@ namespace AWOLCalendarAPI.Services
             {
                 Title = "Team Meeting",
                 Date = DateTime.Now.Date,
-                Time = "10:00 AM",
-                Description = "Weekly team sync-up meeting"
+                Time = "10:00",
+                Description = "Weekly team sync-up meeting",
+                Duration = 60
             });
 
             AddEvent(new Event
             {
                 Title = "Project Deadline",
                 Date = DateTime.Now.Date.AddDays(7),
-                Time = "5:00 PM",
-                Description = "Final submission for the AWOL Calendar project"
+                Time = "17:00",
+                Description = "Final submission for the AWOL Calendar project",
+                Duration = 120
             });
 
             AddEvent(new Event
             {
                 Title = "Lunch with Client",
                 Date = DateTime.Now.Date.AddDays(2),
-                Time = "12:30 PM",
-                Description = "Discuss project requirements over lunch"
+                Time = "12:30",
+                Description = "Discuss project requirements over lunch",
+                Duration = 90
             });
         }
 
@@ -59,9 +62,10 @@ namespace AWOLCalendarAPI.Services
                 }
             }
 
-            // Assume each event lasts 1 hour
+            // Use the event's duration (in minutes) - default to 60 minutes if not set
+            var durationMinutes = eventToCheck.Duration > 0 ? eventToCheck.Duration : 60;
             var eventStart = eventToCheck.Date.Date.Add(eventTime);
-            var eventEnd = eventStart.AddHours(1);
+            var eventEnd = eventStart.AddMinutes(durationMinutes);
 
             // Check for overlaps with other events on the same day
             return _events.Any(e => 
@@ -69,8 +73,11 @@ namespace AWOLCalendarAPI.Services
                 e.Date.Date == eventToCheck.Date.Date && // Same day
                 !string.IsNullOrEmpty(e.Time) && // Has a time
                 ConvertTimeStringToDateTime(e.Date, e.Time, out DateTime otherEventStart) && // Successfully converted time
-                ((eventStart <= otherEventStart.AddHours(1) && eventEnd >= otherEventStart) || // Event starts during other event
-                (otherEventStart <= eventStart && otherEventStart.AddHours(1) >= eventStart)) // Other event starts during event
+                (
+                    // Get other event's duration (in minutes) - default to 60 minutes if not set
+                    (otherEventStart <= eventEnd && 
+                     otherEventStart.AddMinutes(e.Duration > 0 ? e.Duration : 60) >= eventStart)
+                )
             );
         }
 
@@ -110,6 +117,7 @@ namespace AWOLCalendarAPI.Services
             existingEvent.Date = updatedEvent.Date;
             existingEvent.Time = updatedEvent.Time;
             existingEvent.Description = updatedEvent.Description;
+            existingEvent.Duration = updatedEvent.Duration; // Update duration
 
             return true;
         }
