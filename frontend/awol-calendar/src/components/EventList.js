@@ -83,10 +83,6 @@ const EventList = ({ selectedDate, onEditEvent }) => {
   return (
     <>
       <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
-        <Typography variant="h6" component="h2" gutterBottom>
-          {selectedDate ? formatDate(selectedDate) : 'Select a date'}
-        </Typography>
-        
         {selectedDate && (
           <>
             {filteredEvents.length > 0 ? (
