@@ -93,13 +93,6 @@ const EventList = ({ selectedDate, onEditEvent }) => {
     handleCloseDeleteDialog();
   };
 
-  // Format date for display
-  const formatDate = (date) => {
-    if (!date) return '';
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(date).toLocaleDateString('en-GB', options);
-  };
-
   return (
     <>
       <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
@@ -137,17 +130,17 @@ const EventList = ({ selectedDate, onEditEvent }) => {
                           </Typography>
                         }
                         secondary={
-                          <>
+                          <div>
                             <Typography variant="body2" color="text.secondary" component="span">
                               {event.time ? 
-                                `${event.time} (${formatDuration(event.duration)})` : 
+                                `${event.time} ${event.duration ? `(${formatDuration(event.duration)})` : ''}` : 
                                 formatDuration(event.duration)
                               }
                             </Typography>
                             <Typography variant="body2" component="div" sx={{ mt: 1 }}>
                               {event.description}
                             </Typography>
-                          </>
+                          </div>
                         }
                       />
                     </ListItem>

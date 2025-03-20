@@ -61,7 +61,7 @@ const FreeTimeChart = ({ selectedDate }) => {
       if (!event.time) return;
       
       // Parse event time (format: "HH:MM")
-      const [hours, minutes] = event.time.split(':').map(num => parseInt(num, 10));
+      const [hours] = event.time.split(':').map(num => parseInt(num, 10));
       
       // For weekdays, only count events after 5pm
       if (!isWeekend && hours < 17) {
@@ -145,10 +145,10 @@ const FreeTimeChart = ({ selectedDate }) => {
           </ResponsiveContainer>
         </Box>
         
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary" component="div" sx={{ mt: 1, textAlign: 'center' }}>
           {freeTimeData.freeTimeHours} hours free / {freeTimeData.freeTimeHours + freeTimeData.busyTimeHours} hours total
           {freeTimeData.freeTimePercentage < 30 && (
-            <Typography variant="body2" color="error" sx={{ mt: 0.5 }}>
+            <Typography variant="body2" color="error" component="div" sx={{ mt: 0.5 }}>
               Your schedule seems busy! Consider rescheduling some events.
             </Typography>
           )}
