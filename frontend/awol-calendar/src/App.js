@@ -142,6 +142,7 @@ function App() {
                 color="inherit" 
                 startIcon={<AddIcon />}
                 onClick={() => handleAddEvent(selectedDate)}
+                data-testid="toolbar-add-event-button"
               >
                 Add Event
               </Button>

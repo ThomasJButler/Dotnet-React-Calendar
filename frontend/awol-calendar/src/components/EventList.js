@@ -130,17 +130,17 @@ const EventList = ({ selectedDate, onEditEvent }) => {
                           </Typography>
                         }
                         secondary={
-                          <>
+                          <div>
                             <Typography variant="body2" color="text.secondary" component="span">
                               {event.time ? 
-                                `${event.time} (${formatDuration(event.duration)})` : 
+                                `${event.time} ${event.duration ? `(${formatDuration(event.duration)})` : ''}` : 
                                 formatDuration(event.duration)
                               }
                             </Typography>
                             <Typography variant="body2" component="div" sx={{ mt: 1 }}>
                               {event.description}
                             </Typography>
-                          </>
+                          </div>
                         }
                       />
                     </ListItem>
