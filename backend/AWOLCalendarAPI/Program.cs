@@ -26,8 +26,9 @@ app.UseFastEndpoints(c =>
 
 // Add CORS for frontend
 app.UseCors(builder => builder
-    .AllowAnyOrigin()
+    .WithOrigins("http://localhost:3000")
     .AllowAnyMethod()
-    .AllowAnyHeader());
+    .AllowAnyHeader()
+    .AllowCredentials());
 
 app.Run();
