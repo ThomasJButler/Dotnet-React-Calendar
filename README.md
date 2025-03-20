@@ -1,5 +1,9 @@
 # AWOL-Calendar
 
+<img width="1490" alt="image" src="https://github.com/user-attachments/assets/5a9aa088-e873-463d-b9a8-57ae3f9be311" />
+
+<img width="514" alt="image" src="https://github.com/user-attachments/assets/6f543614-fd50-4f9f-a784-fea1dc8c2542" />
+
 A full-stack calendar application built with .NET Core, FastEndpoints, and React.js + Material UI.
 
 ## Project Summary
