@@ -12,8 +12,10 @@ namespace AWOLCalendarAPI.Validators
                 .NotEmpty().WithMessage("Title is required")
                 .MaximumLength(100).WithMessage("Title cannot exceed 100 characters");
 
-            RuleFor(x => x.Date)
-                .NotEmpty().WithMessage("Date is required");
+            RuleFor(x => x.DateString)
+                .NotEmpty().WithMessage("Date is required")
+                .Must(date => DateTime.TryParse(date, out _))
+                .WithMessage("Invalid date format");
 
             RuleFor(x => x.Time)
                 .NotEmpty().WithMessage("Time is required")
