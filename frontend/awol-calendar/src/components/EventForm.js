@@ -11,7 +11,11 @@ import {
   Box,
   Alert,
   Snackbar,
-  Typography
+  Typography,
+  Grid,
+  MenuItem,
+  Select,
+  InputLabel
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
@@ -51,6 +55,8 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [description, setDescription] = useState('');
+  const [durationHours, setDurationHours] = useState(1); // Default: 1 hour
+  const [durationMinutes, setDurationMinutes] = useState(0); // Default: 0 minutes
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showYearPicker, setShowYearPicker] = useState(false);
@@ -82,6 +88,15 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
       }
       
       setDescription(event.description || '');
+      
+      // Set duration in hours and minutes
+      if (event.duration) {
+        setDurationHours(Math.floor(event.duration / 60));
+        setDurationMinutes(event.duration % 60);
+      } else {
+        setDurationHours(1);
+        setDurationMinutes(0);
+      }
     } else {
       // When adding a new event
       resetForm();
@@ -103,6 +118,8 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
     setYearPickerYear(new Date().getFullYear());
     setTime(new Date());
     setDescription('');
+    setDurationHours(1);
+    setDurationMinutes(0);
     setErrors({});
     setShowYearPicker(false);
   };
@@ -124,6 +141,11 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
     
     if (!time) {
       newErrors.time = 'Time is required';
+    }
+    
+    // Validate duration
+    if (durationHours === 0 && durationMinutes < 15) {
+      newErrors.duration = 'Duration must be at least 15 minutes';
     }
     
     setErrors(newErrors);
@@ -189,11 +211,15 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
         `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}` : 
         '';
       
+      // Calculate total duration in minutes
+      const totalDuration = (durationHours * 60) + durationMinutes;
+      
       const eventData = {
         title,
         date: date.toISOString(),
         time: formattedTime,
-        description
+        description,
+        duration: totalDuration
       };
       
       // Check for event overlap
@@ -271,6 +297,12 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
     
     return years;
   };
+
+  // Generate hours options (0-23)
+  const hourOptions = Array.from({ length: 24 }, (_, i) => i);
+  
+  // Generate minutes options (0-55, step 5)
+  const minuteOptions = Array.from({ length: 12 }, (_, i) => i * 5);
 
   return (
     <>
@@ -365,7 +397,7 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
                 
                 <FormControl error={!!errors.time}>
                   <TimePicker
-                    label="Time"
+                    label="Start Time"
                     value={time}
                     onChange={(newTime) => setTime(newTime)}
                     ampm={false}
@@ -377,6 +409,56 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
                       }
                     }}
                   />
+                </FormControl>
+                
+                {/* Duration selection with dropdown pickers */}
+                <FormControl error={!!errors.duration}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Duration
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <InputLabel id="duration-hours-label">Hours</InputLabel>
+                        <Select
+                          labelId="duration-hours-label"
+                          value={durationHours}
+                          label="Hours"
+                          onChange={(e) => setDurationHours(e.target.value)}
+                        >
+                          {hourOptions.map(hour => (
+                            <MenuItem key={`hour-${hour}`} value={hour}>
+                              {hour}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <InputLabel id="duration-minutes-label">Minutes</InputLabel>
+                        <Select
+                          labelId="duration-minutes-label"
+                          value={durationMinutes}
+                          label="Minutes"
+                          onChange={(e) => setDurationMinutes(e.target.value)}
+                        >
+                          {minuteOptions.map(minute => (
+                            <MenuItem key={`minute-${minute}`} value={minute}>
+                              {minute}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                  {errors.duration ? (
+                    <FormHelperText error>{errors.duration}</FormHelperText>
+                  ) : (
+                    <FormHelperText>
+                      Specify how long the event will last
+                    </FormHelperText>
+                  )}
                 </FormControl>
               </LocalizationProvider>
               
@@ -398,7 +480,7 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
               type="submit" 
               color="primary" 
               variant="contained" 
-              disabled={isSubmitting}
+              disabled={isSubmitting || (durationHours === 0 && durationMinutes < 15)}
             >
               {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Add'}
             </Button>

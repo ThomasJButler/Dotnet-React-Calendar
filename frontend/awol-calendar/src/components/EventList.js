@@ -19,6 +19,26 @@ import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useEvents } from '../context/EventContext';
 
 /**
+ * Format duration in minutes to a readable string (e.g., "1h 30min")
+ * @param {number} durationMinutes - Duration in minutes
+ * @returns {string} Formatted duration
+ */
+const formatDuration = (durationMinutes) => {
+  if (!durationMinutes && durationMinutes !== 0) return '';
+  
+  const hours = Math.floor(durationMinutes / 60);
+  const minutes = durationMinutes % 60;
+  
+  if (hours === 0) {
+    return `${minutes}min`;
+  } else if (minutes === 0) {
+    return `${hours}h`;
+  } else {
+    return `${hours}h ${minutes}min`;
+  }
+};
+
+/**
  * EventList component to display events for a selected day
  * @param {Object} props - Component props
  * @returns {JSX.Element} EventList component
@@ -119,7 +139,10 @@ const EventList = ({ selectedDate, onEditEvent }) => {
                         secondary={
                           <>
                             <Typography variant="body2" color="text.secondary" component="span">
-                              {event.time}
+                              {event.time ? 
+                                `${event.time} (${formatDuration(event.duration)})` : 
+                                formatDuration(event.duration)
+                              }
                             </Typography>
                             <Typography variant="body2" component="div" sx={{ mt: 1 }}>
                               {event.description}
