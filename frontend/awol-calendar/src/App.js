@@ -50,26 +50,26 @@ function App() {
       palette: {
         mode: darkMode ? 'dark' : 'light',
         primary: {
-          main: darkMode ? '#90caf9' : '#2e7d32', // Green for light mode
-          light: darkMode ? '#e3f2fd' : '#81c784', // Light green
-          dark: darkMode ? '#42a5f5' : '#1b5e20',  // Dark green
+          main: darkMode ? '#0a84ff' : '#007aff', // Apple blue
+          light: darkMode ? '#409cff' : '#3395ff', 
+          dark: darkMode ? '#0064d0' : '#0062cc',
         },
         secondary: {
-          main: darkMode ? '#f48fb1' : '#c2185b',  // Pink-based
-          light: darkMode ? '#fce4ec' : '#f8bbd0', 
-          dark: darkMode ? '#f06292' : '#880e4f',
+          main: darkMode ? '#98989d' : '#8e8e93',  // Apple gray
+          light: darkMode ? '#aeaeb2' : '#aeaeb2', 
+          dark: darkMode ? '#636366' : '#636366',
         },
         background: {
-          default: darkMode ? '#121212' : '#f8f5f0', // Warmer off-white
-          paper: darkMode ? '#1e1e1e' : '#fefefe',   // Softer white
+          default: darkMode ? '#1c1c1e' : '#f5f5f7', // Apple backgrounds
+          paper: darkMode ? '#2c2c2e' : '#ffffff',   
         },
         text: {
-          primary: darkMode ? '#ffffff' : '#33332d',  // Softer black
-          secondary: darkMode ? '#9e9e9e' : '#5f5f58' // Softer gray
+          primary: darkMode ? '#f5f5f7' : '#1d1d1f',  // Apple text colors
+          secondary: darkMode ? '#98989d' : '#86868b' 
         }
       },
       typography: {
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
       },
       components: {
         MuiCssBaseline: {
@@ -228,6 +228,13 @@ function App() {
             isEditing={isEditing}
             selectedDate={selectedDate}
           />
+          
+          {/* Attribution footer */}
+          <Box className={`footer ${darkMode ? 'dark-mode' : ''}`}>
+            <Typography variant="body2" component="p">
+              Built by Thomas Butler using .NET 9, FastEndpoints, React.js, Material UI
+            </Typography>
+          </Box>
         </Container>
       </EventProvider>
     </ThemeProvider>
