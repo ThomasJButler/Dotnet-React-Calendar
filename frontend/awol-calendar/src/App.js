@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Container, Typography, Box, Button, AppBar, Toolbar, CssBaseline, IconButton, useMediaQuery, Divider } from '@mui/material';
+import { Container, Typography, Box, Button, AppBar, Toolbar, CssBaseline, IconButton, useMediaQuery } from '@mui/material';
 import { Add as AddIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon } from '@mui/icons-material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Calendar from './components/Calendar';
@@ -7,24 +7,7 @@ import EventList from './components/EventList';
 import EventForm from './components/EventForm';
 import FreeTimeChart from './components/FreeTimeChart';
 import { EventProvider } from './context/EventContext';
-import { format } from 'date-fns';
-import { enGB } from 'date-fns/locale';
 import './App.css';
-
-/**
- * Format a date in UK style with ordinal suffix on day (e.g., "15th March 2025")
- * @param {Date} date - The date to format
- * @returns {string} Formatted date string
- */
-const formatDateUK = (date) => {
-  if (!date) return '';
-  try {
-    return format(date, 'do MMMM yyyy', { locale: enGB });
-  } catch (error) {
-    console.error('Date formatting error:', error);
-    return 'Invalid date';
-  }
-};
 
 /**
  * App component with theme and dark mode support

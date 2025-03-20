@@ -61,7 +61,7 @@ const FreeTimeChart = ({ selectedDate }) => {
       if (!event.time) return;
       
       // Parse event time (format: "HH:MM")
-      const [hours, minutes] = event.time.split(':').map(num => parseInt(num, 10));
+      const [hours] = event.time.split(':').map(num => parseInt(num, 10));
       
       // For weekdays, only count events after 5pm
       if (!isWeekend && hours < 17) {

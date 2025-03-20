@@ -93,13 +93,6 @@ const EventList = ({ selectedDate, onEditEvent }) => {
     handleCloseDeleteDialog();
   };
 
-  // Format date for display
-  const formatDate = (date) => {
-    if (!date) return '';
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(date).toLocaleDateString('en-GB', options);
-  };
-
   return (
     <>
       <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
