@@ -4,7 +4,7 @@
 
 <img width="514" alt="image" src="https://github.com/user-attachments/assets/6f543614-fd50-4f9f-a784-fea1dc8c2542" />
 
-A full-stack calendar application built with .NET Core, FastEndpoints, and React.js + Material UI.
+A full-stack calendar application built with .NET Core 9.0, FastEndpoints, and React.js + Material UI.
 
 ## Project Summary
 
