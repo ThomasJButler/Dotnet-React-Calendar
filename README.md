@@ -1,6 +1,6 @@
 # AWOL-Calendar
 
-A full-stack calendar application built with .NET Core, FastEndpoints, and React.js.
+A full-stack calendar application built with .NET Core, FastEndpoints, and React.js + Material UI.
 
 ## Project Summary
 
