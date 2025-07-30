@@ -1,0 +1,382 @@
+/* Apple-inspired UI Styling */
+:root {
+  /* Light mode - Apple-inspired minimal palette */
+  --primary-light: #007aff; /* Apple blue */
+  --primary-light-hover: #0062cc; /* Darker blue for hover states */
+  --secondary-light: #8e8e93; /* Apple subtle gray */
+  --background-light: #f5f5f7; /* Apple light background */
+  --paper-light: #ffffff; /* Pure white */
+  --text-light: #1d1d1f; /* Apple dark gray text */
+  --text-secondary-light: #86868b; /* Apple secondary text */
+  --border-light: #d2d2d7; /* Apple subtle border */
+  --accent-light: #007aff; /* Apple accent blue */
+  
+  /* Dark mode - keeping existing with minor Apple-inspired adjustments */
+  --primary-dark: #0a84ff; /* Apple dark mode blue */
+  --primary-dark-hover: #409cff;
+  --secondary-dark: #98989d; /* Apple dark mode secondary */
+  --background-dark: #1c1c1e; /* Apple dark mode background */
+  --paper-dark: #2c2c2e; /* Apple dark mode surface */
+  --text-dark: #f5f5f7; /* Apple dark mode text */
+  --text-secondary-dark: #98989d; /* Apple dark mode secondary text */
+  --border-dark: #38383a; /* Apple dark mode border */
+  --accent-dark: #0a84ff; /* Apple dark mode accent blue */
+
+  /* Enhanced transitions and styling properties */
+  --transition-speed: 0.3s;
+  --transition-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Lighter, more subtle shadow */
+  --box-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1); /* Stronger shadow for hover states */
+  --box-shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.2);
+  --box-shadow-dark-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  transition: background-color var(--transition-speed) var(--transition-function);
+}
+
+/* Enhanced Paper Components with refined shadows and animations */
+.MuiPaper-root {
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--box-shadow) !important;
+  transition: all var(--transition-speed) var(--transition-function) !important;
+  overflow: hidden; /* Ensures content respects rounded corners */
+}
+
+.MuiPaper-root:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-hover) !important;
+}
+
+.dark-mode .MuiPaper-root {
+  box-shadow: var(--box-shadow-dark) !important;
+}
+
+.dark-mode .MuiPaper-root:hover {
+  box-shadow: var(--box-shadow-dark-hover) !important;
+}
+
+/* Calendar styling enhancements with micro-interactions */
+.calendar-day {
+  border-radius: 6px !important;
+  transition: all 0.2s var(--transition-function) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-day::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  border-radius: 6px;
+  transition: background-color 0.2s var(--transition-function);
+  z-index: -1;
+}
+
+.calendar-day:hover {
+  background-color: rgba(0, 122, 255, 0.08) !important; /* Apple blue tint in light mode */
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+.calendar-day:hover::before {
+  background-color: rgba(0, 122, 255, 0.03);
+}
+
+/* Custom styles for dark mode calendar days */
+.dark-mode .calendar-day {
+  border-color: var(--border-dark) !important;
+}
+
+.dark-mode .calendar-day:hover {
+  background-color: rgba(144, 202, 249, 0.12) !important;
+}
+
+.dark-mode .calendar-day:hover::before {
+  background-color: rgba(144, 202, 249, 0.05);
+}
+
+/* Current day highlight */
+.calendar-day.current-day {
+  background-color: rgba(0, 122, 255, 0.08) !important;
+  font-weight: 700 !important;
+}
+
+.dark-mode .calendar-day.current-day {
+  background-color: rgba(144, 202, 249, 0.12) !important;
+}
+
+/* Event indicator styling with improved visual treatment */
+.event-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.2s var(--transition-function);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Multiple event indicators */
+.event-indicator:nth-child(2) {
+  transform: translateX(calc(-50% - 8px));
+}
+
+.event-indicator:nth-child(3) {
+  transform: translateX(calc(-50% + 8px));
+}
+
+.calendar-day:hover .event-indicator {
+  transform: translateX(-50%) scale(1.2);
+}
+
+.calendar-day:hover .event-indicator:nth-child(2) {
+  transform: translateX(calc(-50% - 8px)) scale(1.2);
+}
+
+.calendar-day:hover .event-indicator:nth-child(3) {
+  transform: translateX(calc(-50% + 8px)) scale(1.2);
+}
+
+/* Event list enhancements with Apple-inspired visual treatment */
+.event-list-item {
+  border-left: 4px solid var(--primary-light);
+  margin-bottom: 12px;
+  border-radius: var(--border-radius);
+  transition: all 0.2s var(--transition-function);
+  padding: 12px;
+  background-color: rgba(0, 122, 255, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.event-list-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background-color: rgba(0, 122, 255, 0.05);
+  transition: width 0.2s var(--transition-function);
+  z-index: 0;
+}
+
+.event-list-item:hover {
+  transform: translateX(4px);
+  box-shadow: var(--box-shadow);
+}
+
+.event-list-item:hover::before {
+  width: 100%;
+}
+
+.dark-mode .event-list-item {
+  border-left: 4px solid var(--primary-dark);
+  background-color: rgba(144, 202, 249, 0.05);
+}
+
+.dark-mode .event-list-item::before {
+  background-color: rgba(144, 202, 249, 0.08);
+}
+
+.event-list-item > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Button enhancements with refined visual treatment */
+.MuiButton-root {
+  border-radius: 20px !important;
+  text-transform: none !important;
+  padding: 8px 18px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.3px !important;
+  transition: all 0.2s var(--transition-function) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.MuiButton-root::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color 0.2s var(--transition-function);
+}
+
+.MuiButton-root:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.MuiButton-root:hover::before {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .MuiButton-root:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Form controls with enhanced styling */
+.MuiFormControl-root {
+  margin-bottom: 20px !important;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: var(--border-radius) !important;
+  transition: all 0.2s var(--transition-function) !important;
+}
+
+.MuiOutlinedInput-root:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+}
+
+.dark-mode .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 4px 12px rgba(144, 202, 249, 0.15);
+}
+
+.MuiInputLabel-root {
+  font-weight: 500 !important;
+}
+
+/* Add event button enhanced animation */
+.add-event-button {
+  transition: all 0.3s var(--transition-function) !important;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15) !important;
+}
+
+.add-event-button:hover {
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.25) !important;
+}
+
+.dark-mode .add-event-button {
+  box-shadow: 0 4px 12px rgba(144, 202, 249, 0.2) !important;
+}
+
+.dark-mode .add-event-button:hover {
+  box-shadow: 0 6px 16px rgba(144, 202, 249, 0.3) !important;
+}
+
+/* Responsive adjustments with enhanced mobile experience */
+@media (max-width: 960px) {
+  .calendar-container {
+    margin-bottom: 24px;
+  }
+  
+  .MuiContainer-root {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Improved touch targets for mobile */
+  .MuiButton-root {
+    padding: 10px 20px !important;
+  }
+  
+  .calendar-day {
+    min-height: 40px !important;
+  }
+}
+
+/* Enhanced animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s var(--transition-function);
+}
+
+.slide-in {
+  animation: slideIn 0.3s var(--transition-function);
+}
+
+.scale-in {
+  animation: scaleIn 0.3s var(--transition-function);
+}
+
+/* Custom scrollbar with improved visual treatment */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 122, 255, 0.2);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 122, 255, 0.3);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background: rgba(144, 202, 249, 0.2);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(144, 202, 249, 0.3);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Footer styling */
+.footer {
+  padding: 16px 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary-light);
+  margin-top: 40px;
+  border-top: 1px solid var(--border-light);
+  transition: all var(--transition-speed) var(--transition-function);
+}
+
+.dark-mode .footer {
+  color: var(--text-secondary-dark);
+  border-top: 1px solid var(--border-dark);
+}
