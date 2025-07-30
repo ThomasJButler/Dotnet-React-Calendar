@@ -4,7 +4,9 @@
       "Bash(npm audit:*)",
       "Bash(powershell:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(rm:*)",
+      "Bash(npm install)"
     ],
     "deny": []
   }
