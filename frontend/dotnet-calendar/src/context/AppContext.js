@@ -9,7 +9,7 @@ const AppContext = createContext();
  * @param {Object} props - Component props
  * @returns {JSX.Element} Provider component
  */
-export const AppProvider = ({ children }) => {
+export const AppProvider = ({ children, disableHealthChecks = false }) => {
   // Toast notifications state
   const [toasts, setToasts] = useState([]);
   
@@ -136,13 +136,14 @@ export const AppProvider = ({ children }) => {
     
     if (isOnline) {
       try {
-        // Try to reach the API with a quick timeout
+        // Check API reachability by getting events with minimal data
+        // This uses the existing endpoint with caching support
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000);
         
-        await fetch(`${apiClient.baseURL}/health`, {
+        await apiClient.get('/events', {
           signal: controller.signal,
-          method: 'HEAD'
+          params: { page: 1, pageSize: 1 } // Minimal data request
         });
         
         clearTimeout(timeoutId);
@@ -222,6 +223,8 @@ export const AppProvider = ({ children }) => {
 
   // Monitor connection status
   useEffect(() => {
+    if (disableHealthChecks) return;
+    
     // Initial check
     updateConnectionStatus();
     
@@ -229,26 +232,28 @@ export const AppProvider = ({ children }) => {
     window.addEventListener('online', updateConnectionStatus);
     window.addEventListener('offline', updateConnectionStatus);
     
-    // Periodic check every 30 seconds
-    const interval = setInterval(updateConnectionStatus, 30000);
+    // Periodic check every 5 minutes (300000ms) instead of 30 seconds
+    const interval = setInterval(updateConnectionStatus, 300000);
     
     return () => {
       window.removeEventListener('online', updateConnectionStatus);
       window.removeEventListener('offline', updateConnectionStatus);
       clearInterval(interval);
     };
-  }, [updateConnectionStatus]);
+  }, [updateConnectionStatus, disableHealthChecks]);
 
   // Monitor API health
   useEffect(() => {
+    if (disableHealthChecks) return;
+    
     // Initial check
     updateApiHealth();
     
-    // Update every 5 seconds
-    const interval = setInterval(updateApiHealth, 5000);
+    // Update every 30 seconds (30000ms) instead of 5 seconds
+    const interval = setInterval(updateApiHealth, 30000);
     
     return () => clearInterval(interval);
-  }, [updateApiHealth]);
+  }, [updateApiHealth, disableHealthChecks]);
 
   // Setup axios interceptor for rate limit headers
   useEffect(() => {

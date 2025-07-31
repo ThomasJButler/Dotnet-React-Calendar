@@ -28,10 +28,15 @@ import { useEvents } from '../context/EventContext';
 /**
  * ApiStatus component for displaying API health and statistics
  */
-const ApiStatus = ({ compact = false }) => {
+const ApiStatus = ({ compact = false, disabled = false }) => {
   const { connectionStatus, rateLimit, apiHealth } = useApp();
   const { apiStats } = useEvents();
   const [expanded, setExpanded] = React.useState(!compact);
+  
+  // Don't render if disabled
+  if (disabled) {
+    return null;
+  }
   
   // Get circuit breaker status color and icon
   const getCircuitBreakerStatus = () => {

@@ -334,7 +334,7 @@ export const EventProvider = ({ children }) => {
 
   // Update API stats periodically
   useEffect(() => {
-    const interval = setInterval(updateApiStats, 5000); // Every 5 seconds
+    const interval = setInterval(updateApiStats, 30000); // Every 30 seconds
     return () => clearInterval(interval);
   }, [updateApiStats]);
 
