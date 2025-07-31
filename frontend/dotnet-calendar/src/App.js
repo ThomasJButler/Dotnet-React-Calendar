@@ -7,6 +7,8 @@ import EventList from './components/EventList';
 import EventForm from './components/EventForm';
 import FreeTimeChart from './components/FreeTimeChart';
 import { EventProvider } from './context/EventContext';
+import { AppProvider } from './context/AppContext';
+import ToastContainer from './components/common/Toast';
 import './App.css';
 
 /**
@@ -120,8 +122,10 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <EventProvider>
-        <Box sx={{ flexGrow: 1 }}>
+      <AppProvider>
+        <EventProvider>
+          <ToastContainer />
+          <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static" color="primary">
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -220,7 +224,8 @@ function App() {
             </Typography>
           </Box>
         </Container>
-      </EventProvider>
+        </EventProvider>
+      </AppProvider>
     </ThemeProvider>
   );
 }

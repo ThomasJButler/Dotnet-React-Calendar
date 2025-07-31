@@ -9,7 +9,8 @@
       "Bash(npm install)",
       "Bash(dotnet test)",
       "Bash(dotnet build)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }
