@@ -22,7 +22,9 @@ import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-picker
 import { format } from 'date-fns';
 import { enGB } from 'date-fns/locale';
 import { useEvents } from '../context/EventContext';
+import { useApp } from '../context/AppContext';
 import EventService from '../services/eventService';
+import { validateEvent } from '../utils/validators';
 
 /**
  * Format a date in UK style with ordinal suffix on day (e.g., "15th March 2025")
@@ -48,7 +50,8 @@ const formatDateUK = (date) => {
  */
 const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
   // Get event context functions
-  const { addEvent, updateEvent } = useEvents();
+  const { addEvent, updateEvent, isLoading } = useEvents();
+  const { showSuccess, showError } = useApp();
   
   // Form state
   const [title, setTitle] = useState('');
@@ -58,10 +61,12 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
   const [durationHours, setDurationHours] = useState(1); // Default: 1 hour
   const [durationMinutes, setDurationMinutes] = useState(0); // Default: 0 minutes
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showYearPicker, setShowYearPicker] = useState(false);
   const [yearPickerYear, setYearPickerYear] = useState(new Date().getFullYear());
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  
+  // Loading states
+  const creating = isLoading('create');
+  const updating = isLoading('update');
 
   // Set form values when editing an existing event or opening form for new event
   useEffect(() => {
@@ -129,32 +134,32 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
    * @returns {boolean} Whether the form is valid
    */
   const validateForm = () => {
-    const newErrors = {};
+    // Format time as string for validation
+    const formattedTime = time ? 
+      `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}` : 
+      '';
     
-    if (!title.trim()) {
-      newErrors.title = 'Title is required';
+    // Calculate total duration in minutes
+    const totalDuration = (durationHours * 60) + durationMinutes;
+    
+    const eventData = {
+      title,
+      date: date?.toISOString(),
+      time: formattedTime,
+      description,
+      duration: totalDuration
+    };
+    
+    const validation = validateEvent(eventData);
+    
+    // Add custom duration validation
+    if (totalDuration < 15) {
+      validation.errors.duration = 'Duration must be at least 15 minutes';
+      validation.isValid = false;
     }
     
-    if (!date) {
-      newErrors.date = 'Date is required';
-    }
-    
-    if (!time) {
-      newErrors.time = 'Time is required';
-    }
-    
-    // Validate duration
-    if (durationHours === 0 && durationMinutes < 15) {
-      newErrors.duration = 'Duration must be at least 15 minutes';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle snackbar close
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
+    setErrors(validation.errors);
+    return validation.isValid;
   };
 
   // Toggle year picker visibility
@@ -202,7 +207,6 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
       return;
     }
     
-    setIsSubmitting(true);
     setErrors({});
     
     try {
@@ -231,49 +235,25 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
           ...errors,
           overlap: 'This event overlaps with an existing event. Please choose a different time.'
         });
-        setIsSubmitting(false);
+        showError('Event conflicts with an existing event. Please choose a different time.');
         return;
       }
       
       if (isEditing && event) {
         // Include ID when updating
-        const updatedEvent = await updateEvent(event.id, { ...eventData, id: event.id });
-        if (updatedEvent) {
-          setSnackbar({
-            open: true,
-            message: 'Event updated successfully!',
-            severity: 'success'
-          });
-          // Close the form after a brief delay to show feedback
-          setTimeout(() => {
-            handleClose();
-            resetForm();
-          }, 1500);
-        }
+        await updateEvent(event.id, { ...eventData, id: event.id });
+        showSuccess('Event updated successfully!');
+        handleClose();
+        resetForm();
       } else {
-        const newEvent = await addEvent(eventData);
-        if (newEvent) {
-          setSnackbar({
-            open: true,
-            message: 'Event added successfully!',
-            severity: 'success'
-          });
-          // Close the form after a brief delay to show feedback
-          setTimeout(() => {
-            handleClose();
-            resetForm();
-          }, 1500);
-        }
+        await addEvent(eventData);
+        showSuccess('Event added successfully!');
+        handleClose();
+        resetForm();
       }
     } catch (error) {
       console.error('Error submitting event:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to save event. Please try again.',
-        severity: 'error'
-      });
-    } finally {
-      setIsSubmitting(false);
+      // Error toast is handled by the context
     }
   };
 
@@ -480,29 +460,13 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
               type="submit" 
               color="primary" 
               variant="contained" 
-              disabled={isSubmitting || (durationHours === 0 && durationMinutes < 15)}
+              disabled={creating || updating || (durationHours === 0 && durationMinutes < 15)}
             >
-              {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Add'}
+              {(creating || updating) ? 'Saving...' : isEditing ? 'Update' : 'Add'}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
-      
-      {/* Snackbar notification */}
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity={snackbar.severity} 
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

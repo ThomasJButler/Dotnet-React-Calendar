@@ -6,6 +6,8 @@ import Calendar from './components/Calendar';
 import EventList from './components/EventList';
 import EventForm from './components/EventForm';
 import FreeTimeChart from './components/FreeTimeChart';
+import EventSearch from './components/EventSearch';
+import ApiStatus from './components/ApiStatus';
 import ErrorBoundary from './components/ErrorBoundary';
 import { EventProvider } from './context/EventContext';
 import { AppProvider } from './context/AppContext';
@@ -157,6 +159,11 @@ function App() {
         </Box>
         
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          {/* Event Search - Always visible at top */}
+          <Box sx={{ mb: 3 }}>
+            <EventSearch />
+          </Box>
+          
           {/* Layout changes for mobile - show date and events above calendar */}
           {isMobile ? (
             <>
@@ -226,6 +233,10 @@ function App() {
             </Typography>
           </Box>
         </Container>
+        
+        {/* API Status indicator - compact mode */}
+        <ApiStatus compact />
+        
           </EventProvider>
         </AppProvider>
       </ErrorBoundary>
