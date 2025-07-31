@@ -51,10 +51,7 @@ export const EventProvider = ({ children }) => {
   // API statistics
   const [apiStats, setApiStats] = useState(null);
 
-  // Fetch all events on component mount
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+  // Note: fetchEvents is defined below, so we'll move this useEffect after the function definition
 
   // Update loading state helper
   const updateLoadingState = useCallback((operation, isLoading) => {
@@ -331,6 +328,11 @@ export const EventProvider = ({ children }) => {
     const stats = EventService.getApiStats();
     setApiStats(stats);
   }, []);
+
+  // Fetch all events on component mount
+  useEffect(() => {
+    fetchEvents();
+  }, []); // fetchEvents doesn't need to be a dependency as it only uses stable callbacks
 
   // Update API stats periodically
   useEffect(() => {

@@ -58,7 +58,7 @@ export const AppProvider = ({ children, disableHealthChecks = false }) => {
     // Auto-remove toast after duration
     if (newToast.duration > 0) {
       setTimeout(() => {
-        removeToast(id);
+        setToasts(prev => prev.filter(t => t.id !== id));
       }, newToast.duration);
     }
     
@@ -153,21 +153,23 @@ export const AppProvider = ({ children, disableHealthChecks = false }) => {
       }
     }
     
-    setConnectionStatus({
-      isOnline,
-      apiReachable,
-      lastChecked: new Date()
+    setConnectionStatus(prev => {
+      // Show notification if connection status changed
+      if (!isOnline && prev.isOnline) {
+        showWarning('You are offline. Some features may be unavailable.');
+      } else if (isOnline && !prev.isOnline) {
+        showSuccess('Connection restored.');
+      } else if (isOnline && !apiReachable && prev.apiReachable) {
+        showError('Cannot reach the API server. Please check your connection.');
+      }
+      
+      return {
+        isOnline,
+        apiReachable,
+        lastChecked: new Date()
+      };
     });
-    
-    // Show notification if connection status changed
-    if (!isOnline && connectionStatus.isOnline) {
-      showWarning('You are offline. Some features may be unavailable.');
-    } else if (isOnline && !connectionStatus.isOnline) {
-      showSuccess('Connection restored.');
-    } else if (isOnline && !apiReachable && connectionStatus.apiReachable) {
-      showError('Cannot reach the API server. Please check your connection.');
-    }
-  }, [connectionStatus, showWarning, showSuccess, showError]);
+  }, []); // No dependencies needed - toast functions are stable
 
   /**
    * Update rate limit info from response headers
@@ -208,18 +210,21 @@ export const AppProvider = ({ children, disableHealthChecks = false }) => {
    */
   const updateApiHealth = useCallback(() => {
     const stats = apiClient.getStats();
-    setApiHealth({
-      ...stats,
-      lastUpdated: new Date()
-    });
     
-    // Show warning if circuit breaker is open
-    if (stats.circuitBreakerState === 'OPEN' && apiHealth.circuitBreakerState !== 'OPEN') {
-      showError('API circuit breaker is open. Service may be experiencing issues.');
-    } else if (stats.circuitBreakerState === 'CLOSED' && apiHealth.circuitBreakerState === 'OPEN') {
-      showSuccess('API service recovered.');
-    }
-  }, [apiHealth, showError, showSuccess]);
+    setApiHealth(prev => {
+      // Show warning if circuit breaker state changed
+      if (stats.circuitBreakerState === 'OPEN' && prev.circuitBreakerState !== 'OPEN') {
+        showError('API circuit breaker is open. Service may be experiencing issues.');
+      } else if (stats.circuitBreakerState === 'CLOSED' && prev.circuitBreakerState === 'OPEN') {
+        showSuccess('API service recovered.');
+      }
+      
+      return {
+        ...stats,
+        lastUpdated: new Date()
+      };
+    });
+  }, []); // No dependencies needed
 
   // Monitor connection status
   useEffect(() => {
