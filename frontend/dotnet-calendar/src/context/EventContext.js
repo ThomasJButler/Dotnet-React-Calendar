@@ -332,6 +332,7 @@ export const EventProvider = ({ children }) => {
   // Fetch all events on component mount
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // fetchEvents doesn't need to be a dependency as it only uses stable callbacks
 
   // Update API stats periodically

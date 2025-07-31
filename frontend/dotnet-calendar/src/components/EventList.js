@@ -22,7 +22,6 @@ import {
 import { Delete as DeleteIcon, Edit as EditIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useEvents } from '../context/EventContext';
 import { useApp } from '../context/AppContext';
-import LoadingSpinner from './common/LoadingSpinner';
 import SkeletonLoader from './common/SkeletonLoader';
 import { formatTime12Hour, formatDuration as formatDurationUtil } from '../utils/formatters';
 
@@ -45,7 +44,6 @@ const EventList = ({ selectedDate, onEditEvent }) => {
   
   // Error states
   const fetchError = getError('fetch');
-  const deleteError = getError('delete');
 
   // Filter events for the selected date
   const filteredEvents = React.useMemo(() => {

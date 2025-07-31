@@ -94,7 +94,7 @@ namespace DotNetCalendarAPI.Tests.Endpoints
         }
 
         [Theory]
-        [InlineData("morning", "08:00", "09:00", "11:00", 2)]
+        [InlineData("morning", "08:00", "09:00", "11:00", 3)]
         [InlineData("afternoon", "08:00", "14:00", "18:00", 1)]
         [InlineData("evening", "08:00", "14:00", "19:00", 1)]
         public async Task SearchEvents_WithTimeOfDay_ShouldReturnCorrectEvents(

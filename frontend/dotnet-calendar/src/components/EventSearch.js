@@ -30,7 +30,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useEvents } from '../context/EventContext';
 import { useDebounce, useLocalStorage } from '../hooks';
-import LoadingSpinner from './common/LoadingSpinner';
 import SkeletonLoader from './common/SkeletonLoader';
 
 /**
@@ -59,42 +58,42 @@ const EventSearch = () => {
   // Loading state
   const loading = isLoading('search');
   
-  // Perform search when query or filters change
-  useEffect(() => {
-    if (debouncedQuery || hasActiveFilters()) {
-      performSearch();
-    }
-  }, [debouncedQuery, filters]);
-  
   // Check if any filters are active
   const hasActiveFilters = () => {
     return filters.startDate || filters.endDate || filters.timeOfDay || 
            filters.minDuration > 0 || filters.maxDuration < 480;
   };
   
-  // Perform the search
-  const performSearch = async () => {
-    const searchParams = {
-      query: debouncedQuery,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      timeOfDay: filters.timeOfDay,
-      minDuration: filters.minDuration > 0 ? filters.minDuration : undefined,
-      maxDuration: filters.maxDuration < 480 ? filters.maxDuration : undefined,
-      sortBy: filters.sortBy,
-      sortDescending: filters.sortDescending,
-      page: 1,
-      pageSize: 20
+  // Perform search when query or filters change
+  useEffect(() => {
+    const performSearch = async () => {
+      const searchParams = {
+        query: debouncedQuery,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        timeOfDay: filters.timeOfDay,
+        minDuration: filters.minDuration > 0 ? filters.minDuration : undefined,
+        maxDuration: filters.maxDuration < 480 ? filters.maxDuration : undefined,
+        sortBy: filters.sortBy,
+        sortDescending: filters.sortDescending,
+        page: 1,
+        pageSize: 20
+      };
+      
+      await searchEvents(searchParams);
+      
+      // Add to search history if query exists
+      if (debouncedQuery && !searchHistory.includes(debouncedQuery)) {
+        const updatedHistory = [debouncedQuery, ...searchHistory.slice(0, 9)];
+        setSearchHistory(updatedHistory);
+      }
     };
     
-    await searchEvents(searchParams);
-    
-    // Add to search history if query exists
-    if (debouncedQuery && !searchHistory.includes(debouncedQuery)) {
-      const updatedHistory = [debouncedQuery, ...searchHistory.slice(0, 9)];
-      setSearchHistory(updatedHistory);
+    if (debouncedQuery || hasActiveFilters()) {
+      performSearch();
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, filters]);
   
   // Clear all filters and search
   const handleClearAll = () => {

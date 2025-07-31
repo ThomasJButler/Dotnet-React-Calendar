@@ -169,6 +169,7 @@ export const AppProvider = ({ children, disableHealthChecks = false }) => {
         lastChecked: new Date()
       };
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // No dependencies needed - toast functions are stable
 
   /**
@@ -224,6 +225,7 @@ export const AppProvider = ({ children, disableHealthChecks = false }) => {
         lastUpdated: new Date()
       };
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // No dependencies needed
 
   // Monitor connection status

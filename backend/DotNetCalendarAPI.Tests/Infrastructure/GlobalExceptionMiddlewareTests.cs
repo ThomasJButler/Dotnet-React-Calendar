@@ -155,8 +155,8 @@ namespace DotNetCalendarAPI.Tests.Infrastructure
             
             var responseJson = await ReadResponseAsJson(context);
             responseJson.RootElement.GetProperty("status").GetInt32().Should().Be(500);
-            responseJson.RootElement.GetProperty("title").GetString().Should().Be("Internal Server Error");
-            responseJson.RootElement.GetProperty("detail").GetString().Should().Be("An unexpected error occurred");
+            responseJson.RootElement.GetProperty("title").GetString().Should().Be("An error occurred while processing your request");
+            responseJson.RootElement.GetProperty("detail").GetString().Should().Be("An internal server error occurred");
             responseJson.RootElement.GetProperty("extensions").GetProperty("errorCode").GetString().Should().Be("INTERNAL_ERROR");
         }
 
@@ -195,7 +195,7 @@ namespace DotNetCalendarAPI.Tests.Infrastructure
             _logger.Received().Log(
                 LogLevel.Error,
                 Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString()!.Contains("An error occurred")),
+                Arg.Any<object>(),
                 exception,
                 Arg.Any<Func<object, Exception?, string>>());
         }

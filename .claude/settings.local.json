@@ -12,7 +12,9 @@
       "Bash(dotnet test:*)",
       "Bash(mkdir:*)",
       "Bash(npm test:*)",
-      "Bash(npm run test-jest:*)"
+      "Bash(npm run test-jest:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": []
   }

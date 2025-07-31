@@ -7,7 +7,6 @@ import {
   LinearProgress,
   Tooltip,
   IconButton,
-  Collapse,
   Grid
 } from '@mui/material';
 import {
@@ -23,14 +22,12 @@ import {
   Wifi as WifiIcon
 } from '@mui/icons-material';
 import { useApp } from '../context/AppContext';
-import { useEvents } from '../context/EventContext';
 
 /**
  * ApiStatus component for displaying API health and statistics
  */
 const ApiStatus = ({ compact = false, disabled = false }) => {
   const { connectionStatus, rateLimit, apiHealth } = useApp();
-  const { apiStats } = useEvents();
   const [expanded, setExpanded] = React.useState(!compact);
   
   // Don't render if disabled
