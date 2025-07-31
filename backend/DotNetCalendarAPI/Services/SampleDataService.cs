@@ -255,6 +255,7 @@ namespace DotNetCalendarAPI.Services
 
         public static void InitializeEvents(EventService eventService)
         {
+            eventService.InitializeNextId(0);
             var events = GetSampleEvents();
             foreach (var evt in events)
             {

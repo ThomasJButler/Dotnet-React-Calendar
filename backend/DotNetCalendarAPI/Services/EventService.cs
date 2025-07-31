@@ -1,47 +1,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using DotNetCalendarAPI.Models;
+using DotNetCalendarAPI.Infrastructure.Exceptions;
+using System.Collections.Concurrent;
 
 namespace DotNetCalendarAPI.Services
 {
     public class EventService
     {
-        private readonly List<Event> _events = new();
+        private readonly ConcurrentDictionary<int, Event> _events = new();
+        private readonly ILogger<EventService> _logger;
+        private int _nextId = 1;
 
-        public EventService()
+        public EventService(ILogger<EventService> logger)
         {
-            // Add some sample events
-            AddEvent(new Event
-            {
-                Title = "Team Meeting",
-                Date = DateTime.Now.Date,
-                Time = "10:00",
-                Description = "Weekly team sync-up meeting",
-                Duration = 60
-            });
-
-            AddEvent(new Event
-            {
-                Title = "Project Deadline",
-                Date = DateTime.Now.Date.AddDays(7),
-                Time = "17:00",
-                Description = "Final submission for the AWOL Calendar project",
-                Duration = 120
-            });
-
-            AddEvent(new Event
-            {
-                Title = "Lunch with Client",
-                Date = DateTime.Now.Date.AddDays(2),
-                Time = "12:30",
-                Description = "Discuss project requirements over lunch",
-                Duration = 90
-            });
+            _logger = logger;
         }
 
-        public List<Event> GetAllEvents() => _events;
 
-        public Event? GetEventById(int id) => _events.FirstOrDefault(e => e.Id == id);
+        public List<Event> GetAllEvents()
+        {
+            _logger.LogInformation("Retrieving all events. Count: {Count}", _events.Count);
+            return _events.Values.OrderBy(e => e.Date).ThenBy(e => e.Time).ToList();
+        }
+
+        public Event? GetEventById(int id)
+        {
+            _logger.LogInformation("Retrieving event with ID: {Id}", id);
+            _events.TryGetValue(id, out var eventItem);
+            
+            if (eventItem == null)
+            {
+                _logger.LogWarning("Event with ID {Id} not found", id);
+            }
+            
+            return eventItem;
+        }
 
         /// <summary>
         /// Checks if an event overlaps with existing events
@@ -68,17 +62,25 @@ namespace DotNetCalendarAPI.Services
             var eventEnd = eventStart.AddMinutes(durationMinutes);
 
             // Check for overlaps with other events on the same day
-            return _events.Any(e => 
+            var hasOverlap = _events.Values.Any(e => 
                 e.Id != (excludeEventId ?? -1) && // Exclude the event being updated
                 e.Date.Date == eventToCheck.Date.Date && // Same day
                 !string.IsNullOrEmpty(e.Time) && // Has a time
                 ConvertTimeStringToDateTime(e.Date, e.Time, out DateTime otherEventStart) && // Successfully converted time
                 (
                     // Get other event's duration (in minutes) - default to 60 minutes if not set
-                    (otherEventStart <= eventEnd && 
-                     otherEventStart.AddMinutes(e.Duration > 0 ? e.Duration : 60) >= eventStart)
+                    (otherEventStart < eventEnd && 
+                     otherEventStart.AddMinutes(e.Duration > 0 ? e.Duration : 60) > eventStart)
                 )
             );
+
+            if (hasOverlap)
+            {
+                _logger.LogInformation("Event overlap detected for event on {Date} at {Time}", 
+                    eventToCheck.Date.ToShortDateString(), eventToCheck.Time);
+            }
+
+            return hasOverlap;
         }
 
         /// <summary>
@@ -104,28 +106,76 @@ namespace DotNetCalendarAPI.Services
 
         public void AddEvent(Event newEvent)
         {
-            newEvent.Id = _events.Count + 1;
-            _events.Add(newEvent);
+            if (newEvent == null)
+            {
+                throw new ValidationException("Event cannot be null");
+            }
+
+            newEvent.Id = System.Threading.Interlocked.Increment(ref _nextId);
+            
+            if (!_events.TryAdd(newEvent.Id, newEvent))
+            {
+                _logger.LogError("Failed to add event with ID {Id}", newEvent.Id);
+                throw new ApiException(500, "Failed to add event", "ADD_EVENT_FAILED");
+            }
+
+            _logger.LogInformation("Event added successfully. ID: {Id}, Title: {Title}", 
+                newEvent.Id, newEvent.Title);
         }
 
         public bool UpdateEvent(int id, Event updatedEvent)
         {
-            var existingEvent = GetEventById(id);
-            if (existingEvent == null) return false;
+            if (updatedEvent == null)
+            {
+                throw new ValidationException("Updated event cannot be null");
+            }
 
-            existingEvent.Title = updatedEvent.Title;
-            existingEvent.Date = updatedEvent.Date;
-            existingEvent.Time = updatedEvent.Time;
-            existingEvent.Description = updatedEvent.Description;
-            existingEvent.Duration = updatedEvent.Duration; // Update duration
+            if (!_events.TryGetValue(id, out var existingEvent))
+            {
+                _logger.LogWarning("Attempted to update non-existent event with ID {Id}", id);
+                return false;
+            }
 
-            return true;
+            // Create updated event preserving the ID
+            var newEvent = new Event
+            {
+                Id = id,
+                Title = updatedEvent.Title,
+                Date = updatedEvent.Date,
+                Time = updatedEvent.Time,
+                Description = updatedEvent.Description,
+                Duration = updatedEvent.Duration
+            };
+
+            if (_events.TryUpdate(id, newEvent, existingEvent))
+            {
+                _logger.LogInformation("Event updated successfully. ID: {Id}, Title: {Title}", 
+                    id, updatedEvent.Title);
+                return true;
+            }
+
+            _logger.LogError("Failed to update event with ID {Id}", id);
+            return false;
         }
 
         public bool DeleteEvent(int id)
         {
-            var eventToRemove = GetEventById(id);
-            return eventToRemove != null && _events.Remove(eventToRemove);
+            if (_events.TryRemove(id, out var removedEvent))
+            {
+                _logger.LogInformation("Event deleted successfully. ID: {Id}, Title: {Title}", 
+                    id, removedEvent.Title);
+                return true;
+            }
+
+            _logger.LogWarning("Attempted to delete non-existent event with ID {Id}", id);
+            return false;
+        }
+
+        public int GetEventCount() => _events.Count;
+
+        public void InitializeNextId(int startId)
+        {
+            _nextId = startId;
         }
     }
 }

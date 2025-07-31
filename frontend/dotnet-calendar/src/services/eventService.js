@@ -1,58 +1,5 @@
-// Import axios as ES module for compatibility with newer versions
-import axios from 'axios';
-
-// Base URL for the API - uses environment variable in production
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5191/api';
-
-// Create an axios instance with default settings
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  timeout: 10000, // 10 seconds timeout
-  validateStatus: status => status >= 200 && status < 300 // Only resolve for success status codes
-});
-
-// Add request interceptor for logging
-axiosInstance.interceptors.request.use(
-  config => {
-    console.log(`Making ${config.method.toUpperCase()} request to: ${config.url}`, config.data);
-    return config;
-  },
-  error => {
-    console.error('Request error:', error);
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor for consistent error handling
-axiosInstance.interceptors.response.use(
-  response => {
-    console.log('Response received:', response.data);
-    return response;
-  },
-  error => {
-    let errorMessage = 'An error occurred while processing your request';
-    
-    if (error.response) {
-      // Server responded with error status
-      console.error('Server error:', error.response.data);
-      errorMessage = error.response.data.message || error.response.data || errorMessage;
-    } else if (error.request) {
-      // Request made but no response received
-      console.error('Network error:', error.request);
-      errorMessage = 'Unable to connect to the server. Please check your network connection.';
-    } else {
-      // Error in request configuration
-      console.error('Request error:', error.message);
-      errorMessage = error.message;
-    }
-    
-    return Promise.reject(new Error(errorMessage));
-  }
-);
+// Import our enhanced API client
+import apiClient from './apiClient';
 
 /**
  * Service for handling event-related API calls
@@ -63,9 +10,31 @@ const EventService = {
    * Fetch all events from the API
    * @returns {Promise} Promise containing the events data
    */
-  getAllEvents: async () => {
+  getAllEvents: async (options = {}) => {
     try {
-      const response = await axiosInstance.get('/events');
+      const { page = 1, pageSize = 100, date } = options;
+      const params = { page, pageSize };
+      
+      if (date) {
+        params.date = date instanceof Date ? date.toISOString() : date;
+      }
+      
+      const response = await apiClient.get('/events', { params });
+      
+      // Handle paginated response
+      if (response.data.data) {
+        // Return just the data array for backward compatibility
+        // Store pagination info in metadata
+        const events = response.data.data;
+        events._pagination = {
+          page: response.data.page,
+          pageSize: response.data.pageSize,
+          totalCount: response.data.totalCount,
+          totalPages: response.data.totalPages
+        };
+        return events;
+      }
+      
       return response.data;
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -80,7 +49,7 @@ const EventService = {
    */
   getEventById: async (id) => {
     try {
-      const response = await axiosInstance.get(`/events/${id}`);
+      const response = await apiClient.get(`/events/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching event with ID ${id}:`, error);
@@ -100,7 +69,11 @@ const EventService = {
         throw new Error('Missing required fields: title, date, and time are required');
       }
 
-      const response = await axiosInstance.post('/events', eventData);
+      const response = await apiClient.post('/events', eventData);
+      
+      // Clear cache after creating event
+      apiClient.clearCache();
+      
       return response.data;
     } catch (error) {
       console.error('Error creating event:', error);
@@ -124,7 +97,11 @@ const EventService = {
         throw new Error('Missing required fields: title, date, and time are required');
       }
 
-      const response = await axiosInstance.put(`/events/${id}`, eventData);
+      const response = await apiClient.put(`/events/${id}`, eventData);
+      
+      // Clear cache after updating event
+      apiClient.clearCache();
+      
       return response.data;
     } catch (error) {
       console.error(`Error updating event with ID ${id}:`, error);
@@ -143,7 +120,11 @@ const EventService = {
         throw new Error('Event ID is required for deletion');
       }
 
-      const response = await axiosInstance.delete(`/events/${id}`);
+      const response = await apiClient.delete(`/events/${id}`);
+      
+      // Clear cache after deleting event
+      apiClient.clearCache();
+      
       return response.data;
     } catch (error) {
       console.error(`Error deleting event with ID ${id}:`, error);
@@ -164,8 +145,8 @@ const EventService = {
         return false;
       }
       
-      // Get all events to check against
-      const allEvents = await EventService.getAllEvents();
+      // Get all events to check against (fetch all pages if needed)
+      const allEvents = await EventService.getAllEvents({ pageSize: 1000 });
       
       // Parse the event date and time
       const eventDate = new Date(eventData.date);
@@ -208,6 +189,66 @@ const EventService = {
       // In case of error, return false to allow event creation as fallback
       return false;
     }
+  },
+
+  /**
+   * Search events with advanced filtering
+   * @param {Object} searchParams - Search parameters
+   * @returns {Promise} Promise containing filtered events
+   */
+  searchEvents: async (searchParams) => {
+    try {
+      const response = await apiClient.get('/events/search', { params: searchParams });
+      return response.data;
+    } catch (error) {
+      console.error('Error searching events:', error);
+      throw new Error(`Failed to search events: ${error.message}`);
+    }
+  },
+
+  /**
+   * Bulk create multiple events
+   * @param {Array} events - Array of event objects to create
+   * @returns {Promise} Promise containing bulk operation results
+   */
+  bulkCreateEvents: async (events) => {
+    try {
+      if (!Array.isArray(events) || events.length === 0) {
+        throw new Error('Events array is required');
+      }
+
+      const response = await apiClient.post('/events/bulk', { events });
+      
+      // Clear cache after bulk operation
+      apiClient.clearCache();
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error bulk creating events:', error);
+      throw new Error(`Failed to bulk create events: ${error.message}`);
+    }
+  },
+
+  /**
+   * Get API statistics (circuit breaker state, cache info, etc)
+   * @returns {Object} API client statistics
+   */
+  getApiStats: () => {
+    return apiClient.getStats();
+  },
+
+  /**
+   * Clear the API cache
+   */
+  clearCache: () => {
+    apiClient.clearCache();
+  },
+
+  /**
+   * Reset circuit breaker if needed
+   */
+  resetCircuitBreaker: () => {
+    apiClient.resetCircuitBreaker();
   }
 };
 

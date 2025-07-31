@@ -6,7 +6,10 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(rm:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(dotnet test)",
+      "Bash(dotnet build)",
+      "Bash(dotnet test:*)"
     ],
     "deny": []
   }
