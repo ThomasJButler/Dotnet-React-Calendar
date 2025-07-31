@@ -368,4 +368,5 @@ const EventSearch = () => {
   );
 };
 
-export default EventSearch;
+// Memoize the EventSearch component to prevent unnecessary re-renders
+export default React.memo(EventSearch);

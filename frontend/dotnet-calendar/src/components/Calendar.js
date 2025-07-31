@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Paper, 
   Grid, 
@@ -6,7 +6,8 @@ import {
   IconButton, 
   Box,
   Badge,
-  useTheme
+  useTheme,
+  Tooltip
 } from '@mui/material';
 import { 
   ChevronLeft as ChevronLeftIcon, 
@@ -15,6 +16,7 @@ import {
   CalendarMonth as CalendarMonthIcon
 } from '@mui/icons-material';
 import { useEvents } from '../context/EventContext';
+import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 
 /**
  * Calendar component to display a monthly calendar view
@@ -25,8 +27,12 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
   const { events } = useEvents();
   const [currentDate, setCurrentDate] = useState(new Date()); // Default to current date
   const [calendarDays, setCalendarDays] = useState([]);
+  const [focusedDayIndex, setFocusedDayIndex] = useState(null);
+  const [isKeyboardMode, setIsKeyboardMode] = useState(false);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
+  const calendarRef = useRef(null);
+  const dayRefs = useRef([]);
 
   /**
    * Generate calendar days for the current month
@@ -130,10 +136,12 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
   /**
    * Handle date selection
    * @param {Date} date - The selected date
+   * @param {number} index - The index of the day in the calendar
    */
-  const handleDateClick = (date) => {
+  const handleDateClick = (date, index) => {
     // Select the date first
     onDateSelect(date);
+    setFocusedDayIndex(index);
   };
   
   /**
@@ -157,8 +165,90 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
 
   // Go to today's date
   const goToToday = () => {
-    setCurrentDate(new Date());
+    const today = new Date();
+    setCurrentDate(today);
+    // Find and focus today's date
+    const todayIndex = calendarDays.findIndex(day => 
+      day.date.toDateString() === today.toDateString()
+    );
+    if (todayIndex !== -1) {
+      setFocusedDayIndex(todayIndex);
+      setTimeout(() => {
+        dayRefs.current[todayIndex]?.focus();
+      }, 100);
+    }
   };
+
+  // Keyboard navigation handlers
+  const moveFocus = useCallback((direction) => {
+    setIsKeyboardMode(true);
+    let newIndex = focusedDayIndex;
+    
+    if (newIndex === null) {
+      // Find today or first day of current month
+      const today = new Date();
+      newIndex = calendarDays.findIndex(day => 
+        day.date.toDateString() === today.toDateString()
+      );
+      if (newIndex === -1) {
+        newIndex = calendarDays.findIndex(day => day.isCurrentMonth);
+      }
+    } else {
+      switch(direction) {
+        case 'left':
+          newIndex = Math.max(0, newIndex - 1);
+          break;
+        case 'right':
+          newIndex = Math.min(calendarDays.length - 1, newIndex + 1);
+          break;
+        case 'up':
+          newIndex = Math.max(0, newIndex - 7);
+          break;
+        case 'down':
+          newIndex = Math.min(calendarDays.length - 1, newIndex + 7);
+          break;
+        case 'home':
+          newIndex = calendarDays.findIndex(day => day.isCurrentMonth);
+          break;
+        case 'end':
+          // Find last day of current month
+          for (let i = calendarDays.length - 1; i >= 0; i--) {
+            if (calendarDays[i].isCurrentMonth) {
+              newIndex = i;
+              break;
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    
+    setFocusedDayIndex(newIndex);
+    // Focus the day element
+    setTimeout(() => {
+      dayRefs.current[newIndex]?.focus();
+    }, 0);
+  }, [focusedDayIndex, calendarDays]);
+
+  // Keyboard navigation hook
+  useKeyboardNavigation({
+    containerRef: calendarRef,
+    enabled: true,
+    onArrowLeft: () => moveFocus('left'),
+    onArrowRight: () => moveFocus('right'),
+    onArrowUp: () => moveFocus('up'),
+    onArrowDown: () => moveFocus('down'),
+    onHome: () => moveFocus('home'),
+    onEnd: () => moveFocus('end'),
+    onEnter: () => {
+      if (focusedDayIndex !== null && calendarDays[focusedDayIndex]) {
+        handleDateClick(calendarDays[focusedDayIndex].date, focusedDayIndex);
+      }
+    },
+    onPageUp: () => handlePrevMonth(),
+    onPageDown: () => handleNextMonth(),
+  });
 
   // Day names for the calendar header
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -184,67 +274,143 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+    <Paper 
+      elevation={3} 
+      sx={{ p: 2, mb: 3 }}
+      ref={calendarRef}
+      role="application"
+      aria-label="Calendar"
+      id="calendar"
+    >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <IconButton onClick={handlePrevMonth} aria-label="previous month">
-          <ChevronLeftIcon />
-        </IconButton>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton 
-            onClick={goToToday} 
-            size="small" 
-            sx={{ mr: 1 }}
-            aria-label="go to today"
-          >
-            <CalendarMonthIcon fontSize="small" />
+        <Tooltip title="Previous month (Page Up)">
+          <IconButton onClick={handlePrevMonth} aria-label="previous month">
+            <ChevronLeftIcon />
           </IconButton>
-          <Typography variant="h6" component="h2" onClick={goToToday} sx={{ cursor: 'pointer' }}>
+        </Tooltip>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Go to today">
+            <IconButton 
+              onClick={goToToday} 
+              size="small" 
+              sx={{ mr: 1 }}
+              aria-label="go to today"
+            >
+              <CalendarMonthIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Typography 
+            variant="h6" 
+            component="h2" 
+            onClick={goToToday} 
+            sx={{ cursor: 'pointer' }}
+            id="calendar-heading"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             {formatMonthYear()}
           </Typography>
         </Box>
-        <IconButton onClick={handleNextMonth} aria-label="next month">
-          <ChevronRightIcon />
-        </IconButton>
+        <Tooltip title="Next month (Page Down)">
+          <IconButton onClick={handleNextMonth} aria-label="next month">
+            <ChevronRightIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
       
-      <Grid container spacing={1} className="calendar-grid">
+      {/* Keyboard navigation instructions - visually hidden but available to screen readers */}
+      <Box 
+        sx={{ 
+          position: 'absolute',
+          left: '-9999px',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden'
+        }}
+        aria-live="polite"
+        role="status"
+      >
+        Use arrow keys to navigate dates, Enter to select, Page Up/Down to change months
+      </Box>
+      
+      <Grid container spacing={1} className="calendar-grid" role="grid" aria-labelledby="calendar-heading">
         {/* Calendar header with day names */}
-        {dayNames.map(day => (
-          <Grid item xs={12/7} key={day}>
-            <Typography 
-              variant="subtitle2" 
-              align="center" 
-              sx={{ fontWeight: 'bold' }}
-            >
-              {day}
-            </Typography>
+        <Grid item xs={12} role="row">
+          <Grid container>
+            {dayNames.map(day => (
+              <Grid item xs={12/7} key={day} role="columnheader">
+                <Typography 
+                  variant="subtitle2" 
+                  align="center" 
+                  sx={{ fontWeight: 'bold' }}
+                  aria-label={day === 'Mon' ? 'Monday' : day === 'Tue' ? 'Tuesday' : day === 'Wed' ? 'Wednesday' : day === 'Thu' ? 'Thursday' : day === 'Fri' ? 'Friday' : day === 'Sat' ? 'Saturday' : 'Sunday'}
+                >
+                  {day}
+                </Typography>
+              </Grid>
+            ))}
           </Grid>
-        ))}
+        </Grid>
         
         {/* Calendar days */}
-        {calendarDays.map((day, index) => (
-          <Grid item xs={12/7} key={index}>
-            <Box
-              onClick={() => handleDateClick(day.date)}
-              sx={{
-                p: 1,
-                height: '60px',
-                border: isDarkMode ? '1px solid #333' : '1px solid #eee',
-                borderRadius: 1,
-                backgroundColor: day.isCurrentMonth 
-                  ? (isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'white') 
-                  : (isDarkMode ? 'rgba(0, 0, 0, 0.2)' : '#f5f5f5'),
-                opacity: day.isCurrentMonth ? 1 : 0.7,
-                cursor: 'pointer',
-                position: 'relative',
-                '&:hover': {
-                  backgroundColor: isDarkMode 
-                    ? 'rgba(144, 202, 249, 0.15)' 
-                    : 'rgba(25, 118, 210, 0.1)',
-                },
-                transition: 'background-color 0.2s',
-              }}
-              className="calendar-day"
+        {calendarDays.map((day, index) => {
+          const isToday = new Date().toDateString() === day.date.toDateString();
+          const isFocused = focusedDayIndex === index;
+          const dateString = day.date.toLocaleDateString('en-GB', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
+          const eventCount = events.filter(event => 
+            new Date(event.date).toDateString() === day.date.toDateString()
+          ).length;
+          
+          return (
+            <Grid item xs={12/7} key={index} role="gridcell">
+              <Box
+                ref={el => dayRefs.current[index] = el}
+                onClick={() => handleDateClick(day.date, index)}
+                onKeyDown={(e) => {
+                  if (e.key === ' ') {
+                    e.preventDefault();
+                    handleDateClick(day.date, index);
+                  }
+                }}
+                tabIndex={isFocused || (focusedDayIndex === null && isToday) ? 0 : -1}
+                role="button"
+                aria-label={`${dateString}${eventCount > 0 ? `, ${eventCount} event${eventCount > 1 ? 's' : ''}` : ''}`}
+                aria-current={isToday ? 'date' : undefined}
+                aria-selected={isFocused}
+                sx={{
+                  p: 1,
+                  height: '60px',
+                  border: isDarkMode ? '1px solid #333' : '1px solid #eee',
+                  borderRadius: 1,
+                  backgroundColor: day.isCurrentMonth 
+                    ? (isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'white') 
+                    : (isDarkMode ? 'rgba(0, 0, 0, 0.2)' : '#f5f5f5'),
+                  opacity: day.isCurrentMonth ? 1 : 0.7,
+                  cursor: 'pointer',
+                  position: 'relative',
+                  outline: isFocused && isKeyboardMode ? `2px solid ${theme.palette.primary.main}` : 'none',
+                  outlineOffset: '-2px',
+                  '&:hover': {
+                    backgroundColor: isDarkMode 
+                      ? 'rgba(144, 202, 249, 0.15)' 
+                      : 'rgba(25, 118, 210, 0.1)',
+                  },
+                  '&:focus': {
+                    outline: `2px solid ${theme.palette.primary.main}`,
+                    outlineOffset: '-2px',
+                  },
+                  '&:focus-visible': {
+                    outline: `2px solid ${theme.palette.primary.main}`,
+                    outlineOffset: '-2px',
+                  },
+                  transition: 'background-color 0.2s',
+                }}
+                className="calendar-day"
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography
@@ -263,22 +429,26 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                   {day.date.getDate()}
                 </Typography>
                 
-                {/* Add event button - only shown on hover */}
+                {/* Add event button - only shown on hover or focus */}
                 {day.isCurrentMonth && (
-                  <IconButton
-                    size="small"
-                    onClick={(e) => handleAddEventClick(day.date, e)}
-                    sx={{ 
-                      p: 0, 
-                      opacity: 0,
-                      '&:hover': { opacity: 1 },
-                      '.MuiSvgIcon-root': { fontSize: '0.875rem' }
-                    }}
-                    className="add-event-button"
-                    aria-label="add event"
-                  >
-                    <AddIcon fontSize="small" />
-                  </IconButton>
+                  <Tooltip title="Add event">
+                    <IconButton
+                      size="small"
+                      onClick={(e) => handleAddEventClick(day.date, e)}
+                      sx={{ 
+                        p: 0, 
+                        opacity: isFocused ? 1 : 0,
+                        '&:hover': { opacity: 1 },
+                        '&:focus': { opacity: 1 },
+                        '.MuiSvgIcon-root': { fontSize: '0.875rem' }
+                      }}
+                      className="add-event-button"
+                      aria-label={`add event on ${dateString}`}
+                      tabIndex={-1}
+                    >
+                      <AddIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 )}
               </Box>
               
@@ -300,9 +470,10 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                   }}
                 />
               )}
-            </Box>
-          </Grid>
-        ))}
+              </Box>
+            </Grid>
+          );
+        })}
       </Grid>
       
       {/* Add hover effect for add event button */}
@@ -315,4 +486,9 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
   );
 };
 
-export default Calendar;
+// Memoize the Calendar component to prevent unnecessary re-renders
+export default React.memo(Calendar, (prevProps, nextProps) => {
+  // Only re-render if the callbacks change
+  return prevProps.onDateSelect === nextProps.onDateSelect &&
+         prevProps.onAddEvent === nextProps.onAddEvent;
+});
