@@ -6,6 +6,7 @@ import Calendar from './components/Calendar';
 import EventList from './components/EventList';
 import EventForm from './components/EventForm';
 import FreeTimeChart from './components/FreeTimeChart';
+import ErrorBoundary from './components/ErrorBoundary';
 import { EventProvider } from './context/EventContext';
 import { AppProvider } from './context/AppContext';
 import ToastContainer from './components/common/Toast';
@@ -122,10 +123,11 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppProvider>
-        <EventProvider>
-          <ToastContainer />
-          <Box sx={{ flexGrow: 1 }}>
+      <ErrorBoundary>
+        <AppProvider>
+          <EventProvider>
+            <ToastContainer />
+            <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static" color="primary">
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -224,8 +226,9 @@ function App() {
             </Typography>
           </Box>
         </Container>
-        </EventProvider>
-      </AppProvider>
+          </EventProvider>
+        </AppProvider>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }
