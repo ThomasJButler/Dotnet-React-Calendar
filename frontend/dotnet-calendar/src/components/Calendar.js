@@ -7,13 +7,18 @@ import {
   Box,
   Badge,
   useTheme,
-  Tooltip
+  Tooltip,
+  useMediaQuery,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import { 
   ChevronLeft as ChevronLeftIcon, 
   ChevronRight as ChevronRightIcon,
   Add as AddIcon,
-  CalendarMonth as CalendarMonthIcon
+  CalendarMonth as CalendarMonthIcon,
+  ViewWeek as ViewWeekIcon,
+  ViewModule as ViewModuleIcon
 } from '@mui/icons-material';
 import { useEvents } from '../context/EventContext';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
@@ -31,11 +36,13 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
+  const isMobile = useMediaQuery('(max-width:900px)');
+  const [viewMode, setViewMode] = useState(isMobile ? 'weekly' : 'monthly');
   const calendarRef = useRef(null);
   const dayRefs = useRef([]);
 
   /**
-   * Generate calendar days for the current month
+   * Generate calendar days for the current month or week
    */
   const generateCalendarDays = useCallback(() => {
     /**
@@ -56,6 +63,31 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
     
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
+    
+    // Generate weekly view
+    if (viewMode === 'weekly') {
+      const days = [];
+      const startOfWeek = new Date(currentDate);
+      const dayOfWeek = startOfWeek.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Start from Monday
+      startOfWeek.setDate(startOfWeek.getDate() + diff);
+      
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        days.push({
+          date: new Date(date),
+          day: date.getDate(),
+          month: date.getMonth(),
+          year: date.getFullYear(),
+          isCurrentMonth: true,
+          hasEvents: hasEventsOnDate(date)
+        });
+      }
+      
+      setCalendarDays(days);
+      return;
+    }
     
     // First day of the month
     const firstDay = new Date(year, month, 1);
@@ -105,7 +137,7 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
     }
     
     setCalendarDays(days);
-  }, [currentDate, events]);
+  }, [currentDate, events, viewMode]);
 
   // Initialize calendar to today's date on first load
   useEffect(() => {
@@ -123,14 +155,30 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
    * Navigate to the previous month
    */
   const handlePrevMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    if (viewMode === 'weekly') {
+      setCurrentDate(prev => {
+        const newDate = new Date(prev);
+        newDate.setDate(newDate.getDate() - 7);
+        return newDate;
+      });
+    } else {
+      setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    }
   };
 
   /**
-   * Navigate to the next month
+   * Navigate to the next month/week
    */
   const handleNextMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    if (viewMode === 'weekly') {
+      setCurrentDate(prev => {
+        const newDate = new Date(prev);
+        newDate.setDate(newDate.getDate() + 7);
+        return newDate;
+      });
+    } else {
+      setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    }
   };
 
   /**
@@ -159,6 +207,20 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
    * @returns {string} Formatted month and year
    */
   const formatMonthYear = () => {
+    if (viewMode === 'weekly') {
+      const startOfWeek = new Date(currentDate);
+      const dayOfWeek = startOfWeek.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      startOfWeek.setDate(startOfWeek.getDate() + diff);
+      
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 6);
+      
+      const startMonth = startOfWeek.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
+      const endMonth = endOfWeek.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' });
+      
+      return `${startMonth} - ${endMonth}`;
+    }
     const options = { month: 'long', year: 'numeric' };
     return currentDate.toLocaleDateString('en-GB', options);
   };
@@ -283,36 +345,62 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
       id="calendar"
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Tooltip title="Previous month (Page Up)">
-          <IconButton onClick={handlePrevMonth} aria-label="previous month">
+        <Tooltip title={viewMode === 'weekly' ? "Previous week" : "Previous month (Page Up)"}>
+          <IconButton onClick={handlePrevMonth} aria-label={viewMode === 'weekly' ? "previous week" : "previous month"}>
             <ChevronLeftIcon />
           </IconButton>
         </Tooltip>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title="Go to today">
-            <IconButton 
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Tooltip title="Go to today">
+              <IconButton 
+                onClick={goToToday} 
+                size="small" 
+                sx={{ mr: 1 }}
+                aria-label="go to today"
+              >
+                <CalendarMonthIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Typography 
+              variant={isMobile ? "subtitle1" : "h6"}
+              component="h2" 
               onClick={goToToday} 
-              size="small" 
-              sx={{ mr: 1 }}
-              aria-label="go to today"
+              sx={{ cursor: 'pointer', fontWeight: isMobile ? 600 : 400 }}
+              id="calendar-heading"
+              aria-live="polite"
+              aria-atomic="true"
             >
-              <CalendarMonthIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Typography 
-            variant="h6" 
-            component="h2" 
-            onClick={goToToday} 
-            sx={{ cursor: 'pointer' }}
-            id="calendar-heading"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            {formatMonthYear()}
-          </Typography>
+              {formatMonthYear()}
+            </Typography>
+          </Box>
+          {isMobile && (
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(event, newView) => {
+                if (newView !== null) {
+                  setViewMode(newView);
+                }
+              }}
+              size="small"
+              aria-label="calendar view mode"
+            >
+              <ToggleButton value="weekly" aria-label="weekly view">
+                <Tooltip title="Weekly view">
+                  <ViewWeekIcon fontSize="small" />
+                </Tooltip>
+              </ToggleButton>
+              <ToggleButton value="monthly" aria-label="monthly view">
+                <Tooltip title="Monthly view">
+                  <ViewModuleIcon fontSize="small" />
+                </Tooltip>
+              </ToggleButton>
+            </ToggleButtonGroup>
+          )}
         </Box>
-        <Tooltip title="Next month (Page Down)">
-          <IconButton onClick={handleNextMonth} aria-label="next month">
+        <Tooltip title={viewMode === 'weekly' ? "Next week" : "Next month (Page Down)"}>
+          <IconButton onClick={handleNextMonth} aria-label={viewMode === 'weekly' ? "next week" : "next month"}>
             <ChevronRightIcon />
           </IconButton>
         </Tooltip>
@@ -333,19 +421,19 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
         Use arrow keys to navigate dates, Enter to select, Page Up/Down to change months
       </Box>
       
-      <Grid container spacing={1} className="calendar-grid" role="grid" aria-labelledby="calendar-heading">
+      <Grid container spacing={viewMode === 'weekly' && isMobile ? 2 : 1} className="calendar-grid" role="grid" aria-labelledby="calendar-heading">
         {/* Calendar header with day names */}
         <Grid item xs={12} role="row">
           <Grid container>
             {dayNames.map(day => (
               <Grid item xs={12/7} key={day} role="columnheader">
                 <Typography 
-                  variant="subtitle2" 
+                  variant={viewMode === 'weekly' && isMobile ? "caption" : "subtitle2"}
                   align="center" 
                   sx={{ fontWeight: 'bold' }}
                   aria-label={day === 'Mon' ? 'Monday' : day === 'Tue' ? 'Tuesday' : day === 'Wed' ? 'Wednesday' : day === 'Thu' ? 'Thursday' : day === 'Fri' ? 'Friday' : day === 'Sat' ? 'Saturday' : 'Sunday'}
                 >
-                  {day}
+                  {viewMode === 'weekly' && isMobile ? day.charAt(0) : day}
                 </Typography>
               </Grid>
             ))}
@@ -383,10 +471,10 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                 aria-current={isToday ? 'date' : undefined}
                 aria-selected={isFocused}
                 sx={{
-                  p: 1,
-                  height: '60px',
+                  p: viewMode === 'weekly' && isMobile ? 2 : 1,
+                  height: viewMode === 'weekly' && isMobile ? '100px' : '60px',
                   border: isDarkMode ? '1px solid #333' : '1px solid #eee',
-                  borderRadius: 1,
+                  borderRadius: viewMode === 'weekly' && isMobile ? 2 : 1,
                   backgroundColor: day.isCurrentMonth 
                     ? (isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'white') 
                     : (isDarkMode ? 'rgba(0, 0, 0, 0.2)' : '#f5f5f5'),
@@ -413,21 +501,28 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                 className="calendar-day"
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 
-                      new Date().toDateString() === day.date.toDateString() 
-                        ? 'bold' 
-                        : 'normal',
-                    color: 
-                      new Date().toDateString() === day.date.toDateString() 
-                        ? 'primary.main' 
-                        : 'text.primary',
-                  }}
-                >
-                  {day.date.getDate()}
-                </Typography>
+                <Box>
+                  <Typography
+                    variant={viewMode === 'weekly' && isMobile ? "h6" : "body2"}
+                    sx={{
+                      fontWeight: 
+                        new Date().toDateString() === day.date.toDateString() 
+                          ? 'bold' 
+                          : 'normal',
+                      color: 
+                        new Date().toDateString() === day.date.toDateString() 
+                          ? 'primary.main' 
+                          : 'text.primary',
+                    }}
+                  >
+                    {day.date.getDate()}
+                  </Typography>
+                  {viewMode === 'weekly' && isMobile && (
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      {day.date.toLocaleDateString('en-GB', { month: 'short' })}
+                    </Typography>
+                  )}
+                </Box>
                 
                 {/* Add event button - only shown on hover or focus */}
                 {day.isCurrentMonth && (
@@ -452,8 +547,17 @@ const Calendar = ({ onDateSelect, onAddEvent }) => {
                 )}
               </Box>
               
+              {/* Event indicator or count for weekly view */}
+              {day.hasEvents && viewMode === 'weekly' && isMobile && eventCount > 0 && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="caption" sx={{ color: getEventColor(day) }}>
+                    {eventCount} event{eventCount > 1 ? 's' : ''}
+                  </Typography>
+                </Box>
+              )}
+              
               {/* Event indicator with traffic light colors */}
-              {day.hasEvents && (
+              {day.hasEvents && !(viewMode === 'weekly' && isMobile) && (
                 <Badge
                   variant="dot"
                   sx={{
