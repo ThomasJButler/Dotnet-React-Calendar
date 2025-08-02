@@ -16,9 +16,24 @@ import ToastContainer from './components/common/Toast';
 import './App.css';
 
 // Lazy load heavy components for better performance
-const FreeTimeChart = lazy(() => import('./components/FreeTimeChart'));
-const AnalyticsDashboard = lazy(() => import('./components/AnalyticsDashboard'));
-const BulkEventManager = lazy(() => import('./components/BulkEventManager'));
+const FreeTimeChart = lazy(() => 
+  import('./components/FreeTimeChart').catch(err => {
+    console.error('Failed to load FreeTimeChart:', err);
+    return { default: () => <div>Error loading FreeTimeChart</div> };
+  })
+);
+const AnalyticsDashboard = lazy(() => 
+  import('./components/AnalyticsDashboard').catch(err => {
+    console.error('Failed to load AnalyticsDashboard:', err);
+    return { default: () => <div>Error loading AnalyticsDashboard</div> };
+  })
+);
+const BulkEventManager = lazy(() => 
+  import('./components/BulkEventManager').catch(err => {
+    console.error('Failed to load BulkEventManager:', err);
+    return { default: () => <div>Error loading BulkEventManager</div> };
+  })
+);
 
 /**
  * App component with theme and dark mode support

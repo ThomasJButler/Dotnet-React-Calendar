@@ -329,9 +329,20 @@ export const EventProvider = ({ children }) => {
     setApiStats(stats);
   }, []);
 
-  // Fetch all events on component mount
+  // Fetch all events on component mount with error handling
   useEffect(() => {
-    fetchEvents();
+    const initFetch = async () => {
+      try {
+        await fetchEvents();
+      } catch (error) {
+        console.error('Failed to fetch initial events:', error);
+        // Don't throw - let the app render with empty events
+      }
+    };
+    
+    // Add a small delay to ensure API is ready
+    const timer = setTimeout(initFetch, 100);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // fetchEvents doesn't need to be a dependency as it only uses stable callbacks
 
