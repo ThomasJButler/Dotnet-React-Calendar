@@ -1,0 +1,171 @@
+### DotNet Calendar API Enhanced Features Test Suite
+### This file demonstrates the advanced API capabilities
+
+@baseUrl = http://localhost:5191/api/v1
+@contentType = application/json
+
+### Health Check Endpoint
+GET http://localhost:5191/health
+Accept: application/json
+
+###
+
+### 1. Get All Events with Pagination
+GET {{baseUrl}}/events?page=1&pageSize=10
+Accept: {{contentType}}
+X-Correlation-Id: test-001
+
+###
+
+### 2. Get Event by ID with Caching
+GET {{baseUrl}}/events/1
+Accept: {{contentType}}
+X-Correlation-Id: test-002
+
+###
+
+### 3. Search Events - Basic Text Search
+GET {{baseUrl}}/events/search?query=meeting&page=1&pageSize=20
+Accept: {{contentType}}
+X-Correlation-Id: test-003
+
+###
+
+### 4. Search Events - Date Range
+GET {{baseUrl}}/events/search?startDate=2025-01-01&endDate=2025-01-31&sortBy=date
+Accept: {{contentType}}
+X-Correlation-Id: test-004
+
+###
+
+### 5. Search Events - Time of Day Filter
+GET {{baseUrl}}/events/search?timeOfDay=morning&sortBy=time
+Accept: {{contentType}}
+X-Correlation-Id: test-005
+
+###
+
+### 6. Search Events - Duration Filter
+GET {{baseUrl}}/events/search?minDuration=60&maxDuration=120
+Accept: {{contentType}}
+X-Correlation-Id: test-006
+
+###
+
+### 7. Create New Event
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+X-Correlation-Id: test-007
+
+{
+  "title": "API Demo Meeting",
+  "date": "2025-02-15",
+  "time": "14:00",
+  "description": "Demonstrating enhanced API features",
+  "duration": 90
+}
+
+###
+
+### 8. Update Event
+PUT {{baseUrl}}/events/1
+Content-Type: {{contentType}}
+X-Correlation-Id: test-008
+
+{
+  "title": "Updated Team Meeting",
+  "date": "2025-01-06",
+  "time": "11:00",
+  "description": "Rescheduled weekly team sync-up meeting",
+  "duration": 45
+}
+
+###
+
+### 9. Bulk Create Events
+POST {{baseUrl}}/events/bulk
+Content-Type: {{contentType}}
+X-Correlation-Id: test-009
+
+{
+  "events": [
+    {
+      "title": "Sprint Planning",
+      "date": "2025-03-01",
+      "time": "09:00",
+      "description": "Q1 Sprint planning session",
+      "duration": 120
+    },
+    {
+      "title": "Sprint Retrospective",
+      "date": "2025-03-14",
+      "time": "16:00",
+      "description": "Sprint review and retrospective",
+      "duration": 60
+    },
+    {
+      "title": "Sprint Demo",
+      "date": "2025-03-14",
+      "time": "14:00",
+      "description": "Sprint demo to stakeholders",
+      "duration": 90
+    }
+  ]
+}
+
+###
+
+### 10. Test Conflict Detection
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+X-Correlation-Id: test-010
+
+{
+  "title": "Conflicting Event",
+  "date": "2025-01-06",
+  "time": "10:00",
+  "description": "This should conflict with the team meeting",
+  "duration": 60
+}
+
+###
+
+### 11. Delete Event
+DELETE {{baseUrl}}/events/2
+X-Correlation-Id: test-011
+
+###
+
+### 12. Test Error Handling - Invalid ID
+GET {{baseUrl}}/events/99999
+Accept: {{contentType}}
+X-Correlation-Id: test-012
+
+###
+
+### 13. Test Error Handling - Invalid Data
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+X-Correlation-Id: test-013
+
+{
+  "title": "",
+  "date": "invalid-date",
+  "time": "25:00"
+}
+
+###
+
+### 14. Test Rate Limiting (run multiple times quickly)
+GET {{baseUrl}}/events?page=1&pageSize=5
+Accept: {{contentType}}
+X-Correlation-Id: test-014
+
+###
+
+### 15. Test Large Pagination
+GET {{baseUrl}}/events?page=1&pageSize=100
+Accept: {{contentType}}
+X-Correlation-Id: test-015
+
+###
