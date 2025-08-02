@@ -8,7 +8,6 @@ import EventForm from './components/EventForm';
 import EventSearch from './components/EventSearch';
 import ApiStatus from './components/ApiStatus';
 import ErrorBoundary from './components/ErrorBoundary';
-import SkipNavigation from './components/common/SkipNavigation';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import { EventProvider } from './context/EventContext';
 import { AppProvider } from './context/AppContext';
@@ -152,7 +151,6 @@ function App() {
       <ErrorBoundary>
         <AppProvider>
           <EventProvider>
-            <SkipNavigation />
             <ToastContainer />
             <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static" color="primary">

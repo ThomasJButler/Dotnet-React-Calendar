@@ -1,180 +1,190 @@
-# DotNet Calendar
+# AWOL Calendar - Full-Stack Calendar Application
 
-<img width="1490" alt="image" src="https://github.com/user-attachments/assets/5a9aa088-e873-463d-b9a8-57ae3f9be311" />
+<img width="1490" alt="Calendar View with Analytics" src="https://github.com/user-attachments/assets/5a9aa088-e873-463d-b9a8-57ae3f9be311" />
 
-<img width="514" alt="image" src="https://github.com/user-attachments/assets/6f543614-fd50-4f9f-a784-fea1dc8c2542" />
+<img width="514" alt="Mobile Responsive View" src="https://github.com/user-attachments/assets/6f543614-fd50-4f9f-a784-fea1dc8c2542" />
 
-A full-stack calendar application showcasing modern web development with .NET Core 9.0, FastEndpoints, and React.js + Material UI. Originally developed as part of a code assessment during my job search, I've enhanced and modified it to serve as a portfolio piece demonstrating full-stack capabilities.
+A production-ready calendar application showcasing modern web development with **React.js** and **.NET Core 9.0**, featuring real-time API analytics, advanced state management, and enterprise-grade error handling. This project demonstrates full-stack engineering capabilities with a particular emphasis on backend architecture and API design.
 
-## 📋 Project Overview
+🚀 **Live Demo**: [Frontend on Vercel](https://your-app.vercel.app) | [Backend API on Azure](https://your-api.azurewebsites.net)
 
-DotNet Calendar is a web application that allows users to create, view, update, and delete calendar events. The project features a modern React frontend with Material UI components and a .NET Core backend using the FastEndpoints library for API endpoints.
+## 🎯 Project Highlights
 
-## ✨ Key Features
-
-- **Interactive Calendar**: Monthly view with intuitive date navigation
-- **Event Management**: Full CRUD operations for calendar events
-- **Dark Mode**: Smooth theme transitions with Material UI
-- **Responsive Design**: Mobile-optimized layout that works on all devices
-- **Event Overlap Detection**: Prevents double-booking time slots
-- **Data Visualization**: Free time charts using Recharts
-- **Real-time Updates**: Context API for instant UI updates
-- **Sample Data**: Pre-populated events for easy testing
+This calendar application goes beyond basic CRUD operations to demonstrate:
+- **Production-Grade API Client**: Circuit breaker pattern, retry logic, request deduplication
+- **Real-Time API Analytics**: Live monitoring dashboard showing API health, response times, and circuit breaker status
+- **Advanced State Management**: Optimistic updates, granular loading states, and intelligent caching
+- **Enterprise Error Handling**: Toast notifications, error boundaries, and graceful degradation
+- **Performance Optimization**: Lazy loading, debounced search, and response caching
 
 ## 🛠️ Technology Stack
 
-### Backend
-- **.NET Core 9.0** - Modern cross-platform framework
-- **FastEndpoints** - High-performance REST API library
-- **FluentValidation** - Robust input validation
-- **xUnit** - Unit testing framework
-- **In-memory Storage** - Simplified deployment (easily replaceable with database)
+### Backend (.NET Core 9.0)
+- **FastEndpoints** - High-performance, minimal API framework
+- **FluentValidation** - Comprehensive input validation
+- **AspNetCoreRateLimit** - API rate limiting middleware
+- **Custom Middleware** - Request logging, exception handling, correlation IDs
+- **xUnit & FluentAssertions** - Comprehensive test coverage
+- **In-Memory Storage** - Thread-safe implementation (easily replaceable with EF Core)
 
-### Frontend
-- **React 19.0** - Latest React with improved performance
-- **Material UI 6.4.8** - Comprehensive component library
-- **React Context API** - Global state management
-- **Axios** - HTTP client with interceptors
-- **Recharts** - Data visualization library
-- **Tailwind CSS** - Utility-first styling
-- **Jest & React Testing Library** - Component testing
+### Frontend (React 19.0)
+- **Material UI 6.4.8** - Modern component library with theming
+- **Context API** - Global state management with optimistic updates
+- **Custom Hooks** - useDebounce, useLocalStorage, useApi
+- **Recharts** - Data visualization for free time analysis
+- **React Error Boundaries** - Graceful error handling
+- **Axios with Interceptors** - Advanced HTTP client
+- **Web Vitals** - Performance monitoring
 
-## 📁 Project Structure
+## ✨ Key Features
 
+### Core Calendar Functionality
+- 📅 Interactive monthly calendar with intuitive navigation
+- 📝 Full CRUD operations for events with validation
+- 🔍 Advanced search with real-time filtering
+- 📊 Free time visualization and analytics
+- 🌙 Dark/Light theme with smooth transitions
+- 📱 Fully responsive design
+
+### v2.0 Enhancements
+
+#### 🔌 Advanced API Integration
+- **Circuit Breaker Pattern**: Prevents cascading failures
+- **Intelligent Retry Logic**: Exponential backoff with jitter
+- **Request Deduplication**: Prevents duplicate API calls
+- **Response Caching**: ETag-based caching with TTL
+- **Rate Limit Handling**: Visual indicators and automatic backoff
+
+#### 📊 Real-Time Analytics Dashboard
+- **API Health Monitoring**: Connection status, response times
+- **Circuit Breaker Visualization**: Real-time state tracking
+- **Performance Metrics**: Request counts, error rates
+- **Event Analytics**: Usage patterns and statistics
+
+#### 🎨 Enhanced User Experience
+- **Toast Notifications**: Non-intrusive feedback system
+- **Skeleton Loaders**: Smooth loading states
+- **Error Boundaries**: Graceful error recovery
+- **Debounced Search**: Optimized search performance
+- **Bulk Operations**: Import/Export events via CSV
+
+## 🏗️ Architecture & Design Patterns
+
+### Backend Architecture
 ```
-DotNet-Calendar/
-├── backend/
-│   ├── DotNetCalendarAPI/
-│   │   ├── Endpoints/          # FastEndpoints API endpoints
-│   │   ├── Models/             # Domain entities and DTOs
-│   │   ├── Services/           # Business logic layer
-│   │   ├── Validators/         # FluentValidation validators
-│   │   └── Program.cs          # Application entry point
-│   └── DotNetCalendarAPI.Tests/
-│       ├── Endpoints/          # Endpoint unit tests
-│       └── Services/           # Service unit tests
-├── frontend/
-│   └── dotnet-calendar/
-│       ├── public/             # Static assets
-│       └── src/
-│           ├── components/     # React components
-│           ├── context/        # State management
-│           ├── services/       # API integration
-│           └── App.js          # Main application
-└── CLAUDE.md                   # AI assistant instructions
+DotNetCalendarAPI/
+├── Endpoints/              # FastEndpoints with Request/Response models
+├── Services/              # Business logic with thread-safe operations
+├── Validators/            # FluentValidation rules
+├── Middleware/            # Custom middleware pipeline
+│   ├── RequestLoggingMiddleware
+│   ├── ExceptionHandlingMiddleware
+│   └── RateLimitMiddleware
+└── Models/                # Domain entities and DTOs
 ```
 
-## 🚀 Getting Started
+### Frontend Architecture
+```
+src/
+├── components/            # UI components with error boundaries
+├── context/              # Global state management
+│   ├── EventContext      # Event state with optimistic updates
+│   └── AppContext        # Application-wide state
+├── services/             # API integration layer
+│   ├── apiClient         # Advanced HTTP client
+│   └── eventService      # Event-specific operations
+├── hooks/                # Custom React hooks
+└── utils/                # Helper functions
+```
+
+## 🚀 What I Learned
+
+This project was an incredible learning journey where I:
+
+1. **Mastered FastEndpoints**: Moved beyond traditional controllers to embrace a more functional, endpoint-focused architecture
+2. **Implemented Resilience Patterns**: Built production-grade error handling with circuit breakers and retry logic
+3. **Advanced State Management**: Developed complex state synchronization with optimistic updates and rollback
+4. **Performance Optimization**: Addressed real-world issues like rate limiting and request deduplication
+5. **Full-Stack Integration**: Created seamless communication between React and .NET with proper error handling
+
+## 💡 Technical Achievements
+
+### Backend Engineering
+- ✅ Thread-safe in-memory storage with concurrent operations
+- ✅ Comprehensive middleware pipeline with correlation tracking
+- ✅ Advanced search with multiple filter combinations
+- ✅ Rate limiting with configurable policies
+- ✅ Global exception handling with problem details
+
+### Frontend Engineering
+- ✅ Production-grade API client with multiple resilience patterns
+- ✅ Real-time health monitoring with visual feedback
+- ✅ Advanced search with debouncing and caching
+- ✅ Optimistic updates with automatic rollback
+- ✅ Performance monitoring with Web Vitals
+
+## 📦 Installation & Setup
 
 ### Prerequisites
+- .NET 9.0 SDK or later
+- Node.js 16.x or later
+- Git
 
-- **.NET 9.0 SDK** or later ([Download](https://dotnet.microsoft.com/download))
-- **Node.js 16.x** or later ([Download](https://nodejs.org/))
-- **Git** for cloning the repository
-
-### Installation & Setup
+### Local Development
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/dotnet-calendar.git
-   cd dotnet-calendar
+   git clone https://github.com/yourusername/awol-calendar.git
+   cd awol-calendar
    ```
 
 2. **Backend Setup**
    ```bash
-   # Navigate to the backend directory
    cd backend/DotNetCalendarAPI
-   
-   # Build the project
    dotnet build
-   
-   # Run the API server
    dotnet run
    ```
-   The API will be available at `http://localhost:5191`
+   API runs at `http://localhost:5191`
 
-3. **Frontend Setup** (in a new terminal)
+3. **Frontend Setup**
    ```bash
-   # Navigate to the frontend directory
    cd frontend/dotnet-calendar
-   
-   # Install dependencies
    npm install
-   
-   # Start the development server
    npm start
    ```
-   The application will open at `http://localhost:3000`
+   App opens at `http://localhost:3000`
 
-## 🔧 Development
+## 🔧 Configuration
 
-### Backend Commands
-
-```bash
-# Run from backend/DotNetCalendarAPI directory
-dotnet build              # Build the project
-dotnet run                # Run the API server
-dotnet watch              # Run with hot reload
-
-# Run from backend/DotNetCalendarAPI.Tests directory
-dotnet test               # Run all tests
-dotnet test --logger "console;verbosity=detailed"  # Verbose test output
+### Backend (appsettings.json)
+```json
+{
+  "IpRateLimiting": {
+    "GeneralRules": [{
+      "Endpoint": "*",
+      "Period": "1m",
+      "Limit": 60
+    }]
+  }
+}
 ```
 
-### Frontend Commands
-
-```bash
-# Run from frontend/dotnet-calendar directory
-npm start                 # Start development server
-npm test                  # Run tests in watch mode
-npm run test-jest         # Run tests with Jest config
-npm run build            # Build for production
-npm test -- --coverage   # Run tests with coverage report
+### Frontend (.env)
+```
+REACT_APP_API_URL=http://localhost:5191/api
 ```
 
 ## 📡 API Endpoints
 
-All endpoints are prefixed with `/api`:
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/events` | Get all events |
-| GET | `/api/events/{id}` | Get specific event by ID |
-| POST | `/api/events` | Create new event |
-| PUT | `/api/events/{id}` | Update existing event |
+| GET | `/api/events` | Get all events with optional filters |
+| GET | `/api/events/{id}` | Get specific event |
+| POST | `/api/events` | Create event with validation |
+| PUT | `/api/events/{id}` | Update event |
 | DELETE | `/api/events/{id}` | Delete event |
-
-### Example Request
-
-```bash
-# Create a new event
-curl -X POST http://localhost:5191/api/events \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Team Meeting",
-    "date": "2024-01-20",
-    "time": "14:00",
-    "description": "Weekly sync",
-    "duration": 60
-  }'
-```
-
-## 🏗️ Architecture
-
-### Backend Architecture
-The backend follows **FastEndpoints** architecture patterns:
-- **Self-contained endpoints** with dedicated Request/Response models
-- **Service layer** for business logic and data management
-- **FluentValidation** for robust input validation
-- **In-memory storage** for simplified deployment (easily replaceable)
-
-### Frontend Architecture
-The frontend uses modern React patterns:
-- **Functional components** with hooks
-- **Context API** for global state management
-- **Custom hooks** for reusable logic
-- **Service layer** for API communication
-- **Material UI theming** for consistent design
+| POST | `/api/events/search` | Advanced search with filters |
+| POST | `/api/events/bulk` | Bulk import/export |
 
 ## 🧪 Testing
 
@@ -182,67 +192,44 @@ The frontend uses modern React patterns:
 ```bash
 cd backend/DotNetCalendarAPI.Tests
 dotnet test
-
-# Run specific test category
-dotnet test --filter FullyQualifiedName~EventServiceTests
 ```
+- 122 total tests covering endpoints, services, and middleware
+- Comprehensive validation testing
+- Thread-safety verification
 
 ### Frontend Tests
 ```bash
 cd frontend/dotnet-calendar
 npm test
-
-# Run with coverage
-npm test -- --coverage --watchAll=false
 ```
+- Component testing with React Testing Library
+- Context and hook testing
+- API client testing
 
-## 🔒 Security Considerations
+## 🎓 Portfolio Context
 
-- **CORS** configured for localhost development
-- **Input validation** on both client and server
-- **Error handling** with appropriate status codes
-- **Request timeouts** to prevent hanging connections
+This project showcases my journey from basic web development to implementing enterprise-grade patterns. Starting as a simple calendar for a code assessment, I transformed it into a production-ready application demonstrating:
 
-## 📝 Environment Configuration
+- **Backend Excellence**: Clean architecture with FastEndpoints, comprehensive middleware, and thread-safe operations
+- **Modern Frontend**: React with advanced state management, error handling, and performance optimization
+- **Full-Stack Integration**: Seamless API communication with resilience patterns
+- **Problem-Solving**: Addressed real-world challenges like rate limiting and infinite loops
+- **Best Practices**: Clean code, comprehensive testing, and documentation
 
-### Backend Configuration
-Update `appsettings.json` for different environments:
-```json
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information"
-    }
-  },
-  "AllowedHosts": "*"
-}
-```
+## 🔮 Future Enhancements
 
-### Frontend Configuration
-Environment variables in `.env`:
-```
-REACT_APP_API_URL=http://localhost:5191/api
-```
-
-## 🎯 Portfolio Context
-
-This project was initially created for a code assessment during my job search. I've enhanced it to demonstrate:
-
-- **Clean Architecture** principles
-- **Modern API Design** with FastEndpoints
-- **React Best Practices** and component patterns
-- **Responsive UI/UX** implementation
-- **Test-Driven Development** approach
-- **Professional Documentation** standards
+While the application is fully functional, potential improvements include:
+- TypeScript migration for enhanced type safety
+- GraphQL API implementation
+- WebSocket support for real-time updates
+- Multi-user support with authentication
+- Database integration with Entity Framework Core
+- Deployment automation with CI/CD
 
 ## 📄 License
 
-This project is available as a portfolio piece. Feel free to use it as a reference or starting point for your own projects.
-
-## 🤝 Contributing
-
-As this is a portfolio project, I'm not actively seeking contributions. However, feel free to fork and modify for your own use!
+This is a personal portfolio project. Feel free to explore the code and use it as inspiration for your own projects.
 
 ---
 
-Built with ❤️ by Thomas Butler
+Built with passion by Thomas Butler | [LinkedIn](https://linkedin.com/in/yourprofile) | [GitHub](https://github.com/yourusername)
