@@ -1,36 +1,42 @@
 /* Apple-inspired UI Styling */
 :root {
-  /* Light mode - Apple-inspired minimal palette */
-  --primary-light: #007aff; /* Apple blue */
-  --primary-light-hover: #0062cc; /* Darker blue for hover states */
-  --secondary-light: #8e8e93; /* Apple subtle gray */
-  --background-light: #f5f5f7; /* Apple light background */
-  --paper-light: #ffffff; /* Pure white */
-  --text-light: #1d1d1f; /* Apple dark gray text */
-  --text-secondary-light: #86868b; /* Apple secondary text */
-  --border-light: #d2d2d7; /* Apple subtle border */
-  --accent-light: #007aff; /* Apple accent blue */
+  /* Light mode - Warm, sophisticated palette */
+  --primary-light: #2A7F7E; /* Sophisticated teal */
+  --primary-light-hover: #1F5F5E; /* Deeper teal for hover states */
+  --secondary-light: #6B5B5D; /* Warm gray */
+  --background-light: #F7F3F0; /* Light warm beige */
+  --paper-light: #FFFFFF; /* Soft white with warmth */
+  --text-light: #2C2926; /* Rich charcoal */
+  --text-secondary-light: #5C5552; /* Warm medium gray */
+  --border-light: #E0D5D0; /* Soft taupe border */
+  --accent-light: #E8B4B8; /* Soft coral accent */
+  --success-light: #4A7C59; /* Sage green */
+  --warning-light: #D4A574; /* Warm amber */
+  --error-light: #C1666B; /* Muted red */
   
-  /* Dark mode - keeping existing with minor Apple-inspired adjustments */
-  --primary-dark: #0a84ff; /* Apple dark mode blue */
-  --primary-dark-hover: #409cff;
-  --secondary-dark: #98989d; /* Apple dark mode secondary */
-  --background-dark: #1c1c1e; /* Apple dark mode background */
-  --paper-dark: #2c2c2e; /* Apple dark mode surface */
-  --text-dark: #f5f5f7; /* Apple dark mode text */
-  --text-secondary-dark: #98989d; /* Apple dark mode secondary text */
-  --border-dark: #38383a; /* Apple dark mode border */
-  --accent-dark: #0a84ff; /* Apple dark mode accent blue */
+  /* Dark mode - Enhanced with deeper, richer colors */
+  --primary-dark: #64B5F6; /* Soft sky blue */
+  --primary-dark-hover: #90CAF9; /* Lighter blue hover */
+  --secondary-dark: #CE93D8; /* Soft purple */
+  --background-dark: #121212; /* True black background */
+  --paper-dark: #1E1E1E; /* Elevated surface */
+  --text-dark: #E8E8E8; /* Soft white text */
+  --text-secondary-dark: #B0B0B0; /* Muted gray text */
+  --border-dark: #2A2A2A; /* Subtle border */
+  --accent-dark: #A5D6A7; /* Soft mint green accent */
+  --success-dark: #81C784; /* Light green */
+  --warning-dark: #FFB74D; /* Warm orange */
+  --error-dark: #E57373; /* Soft red */
 
   /* Enhanced transitions and styling properties */
   --transition-speed: 0.3s;
   --transition-function: cubic-bezier(0.4, 0, 0.2, 1);
   --border-radius: 8px;
   --border-radius-lg: 12px;
-  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Lighter, more subtle shadow */
-  --box-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1); /* Stronger shadow for hover states */
-  --box-shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.2);
-  --box-shadow-dark-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --box-shadow: 0 4px 20px rgba(107, 91, 93, 0.08); /* Warm shadow */
+  --box-shadow-hover: 0 8px 24px rgba(107, 91, 93, 0.15); /* Stronger warm shadow */
+  --box-shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --box-shadow-dark-hover: 0 8px 24px rgba(0, 0, 0, 0.7);
 }
 
 body {
@@ -38,6 +44,18 @@ body {
   padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   transition: background-color var(--transition-speed) var(--transition-function);
+}
+
+/* Light mode gradient background */
+body.light-mode {
+  background: linear-gradient(135deg, #F7F3F0 0%, #FAF8F6 50%, #F3EFEC 100%);
+  min-height: 100vh;
+}
+
+/* Dark mode background with subtle gradient */
+body.dark-mode {
+  background: linear-gradient(135deg, #121212 0%, #1a1a1a 50%, #0f0f0f 100%);
+  min-height: 100vh;
 }
 
 /* Enhanced Paper Components with refined shadows and animations */
@@ -83,36 +101,40 @@ body {
 }
 
 .calendar-day:hover {
-  background-color: rgba(0, 122, 255, 0.08) !important; /* Apple blue tint in light mode */
+  background-color: rgba(42, 127, 126, 0.08) !important; /* Teal tint in light mode */
   cursor: pointer;
   transform: scale(1.02);
 }
 
 .calendar-day:hover::before {
-  background-color: rgba(0, 122, 255, 0.03);
+  background-color: rgba(42, 127, 126, 0.03);
 }
 
 /* Custom styles for dark mode calendar days */
 .dark-mode .calendar-day {
   border-color: var(--border-dark) !important;
+  background-color: rgba(30, 30, 30, 0.6) !important;
 }
 
 .dark-mode .calendar-day:hover {
-  background-color: rgba(144, 202, 249, 0.12) !important;
+  background-color: rgba(100, 181, 246, 0.15) !important;
+  border-color: rgba(100, 181, 246, 0.3) !important;
 }
 
 .dark-mode .calendar-day:hover::before {
-  background-color: rgba(144, 202, 249, 0.05);
+  background-color: rgba(100, 181, 246, 0.08);
 }
 
 /* Current day highlight */
 .calendar-day.current-day {
-  background-color: rgba(0, 122, 255, 0.08) !important;
+  background-color: rgba(232, 180, 184, 0.15) !important; /* Coral tint */
   font-weight: 700 !important;
+  border-color: rgba(232, 180, 184, 0.3) !important;
 }
 
 .dark-mode .calendar-day.current-day {
-  background-color: rgba(144, 202, 249, 0.12) !important;
+  background-color: rgba(165, 214, 167, 0.2) !important; /* Mint green tint */
+  border-color: rgba(165, 214, 167, 0.4) !important;
 }
 
 /* Event indicator styling with improved visual treatment */
@@ -149,14 +171,14 @@ body {
   transform: translateX(calc(-50% + 8px)) scale(1.2);
 }
 
-/* Event list enhancements with Apple-inspired visual treatment */
+/* Event list enhancements with warm visual treatment */
 .event-list-item {
   border-left: 4px solid var(--primary-light);
   margin-bottom: 12px;
   border-radius: var(--border-radius);
   transition: all 0.2s var(--transition-function);
   padding: 12px;
-  background-color: rgba(0, 122, 255, 0.03);
+  background: linear-gradient(135deg, rgba(42, 127, 126, 0.03) 0%, rgba(232, 180, 184, 0.03) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -168,7 +190,7 @@ body {
   left: 0;
   height: 100%;
   width: 0;
-  background-color: rgba(0, 122, 255, 0.05);
+  background: linear-gradient(135deg, rgba(42, 127, 126, 0.05) 0%, rgba(232, 180, 184, 0.05) 100%);
   transition: width 0.2s var(--transition-function);
   z-index: 0;
 }
@@ -184,11 +206,11 @@ body {
 
 .dark-mode .event-list-item {
   border-left: 4px solid var(--primary-dark);
-  background-color: rgba(144, 202, 249, 0.05);
+  background: linear-gradient(135deg, rgba(100, 181, 246, 0.08) 0%, rgba(206, 147, 216, 0.08) 100%);
 }
 
 .dark-mode .event-list-item::before {
-  background-color: rgba(144, 202, 249, 0.08);
+  background: linear-gradient(135deg, rgba(100, 181, 246, 0.12) 0%, rgba(206, 147, 216, 0.12) 100%);
 }
 
 .event-list-item > * {
@@ -247,7 +269,7 @@ body {
 }
 
 .MuiOutlinedInput-root.Mui-focused {
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(42, 127, 126, 0.15);
 }
 
 .dark-mode .MuiOutlinedInput-root.Mui-focused {
@@ -261,12 +283,12 @@ body {
 /* Add event button enhanced animation */
 .add-event-button {
   transition: all 0.3s var(--transition-function) !important;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(42, 127, 126, 0.15) !important;
 }
 
 .add-event-button:hover {
   transform: rotate(90deg) scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.25) !important;
+  box-shadow: 0 6px 16px rgba(42, 127, 126, 0.25) !important;
 }
 
 .dark-mode .add-event-button {
@@ -278,7 +300,26 @@ body {
 }
 
 /* Responsive adjustments with enhanced mobile experience */
-@media (max-width: 960px) {
+@media (max-width: 900px) {
+  /* Mobile header adjustments */
+  .MuiAppBar-root .MuiToolbar-root {
+    min-height: 56px !important;
+    padding-left: 12px !important;
+    padding-right: 8px !important;
+  }
+  
+  /* More compact spacing for mobile header buttons */
+  .MuiAppBar-root .MuiIconButton-root {
+    padding: 8px !important;
+  }
+  
+  /* Ensure header title doesn't wrap */
+  .MuiAppBar-root .MuiTypography-root {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
   .calendar-container {
     margin-bottom: 24px;
   }
@@ -296,6 +337,57 @@ body {
   .calendar-day {
     min-height: 40px !important;
   }
+  
+  /* Event list items on mobile */
+  .event-list-item {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  /* Larger touch targets for mobile buttons */
+  .MuiIconButton-root {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+  
+  /* Better spacing for mobile event list */
+  .MuiList-root {
+    padding: 8px !important;
+  }
+  
+  .MuiListItem-root {
+    margin-bottom: 8px !important;
+    border-radius: 8px !important;
+  }
+}
+
+/* Extra small mobile screens */
+@media (max-width: 600px) {
+  .MuiAppBar-root .MuiToolbar-root {
+    min-height: 48px !important;
+    padding-left: 8px !important;
+    padding-right: 4px !important;
+  }
+  
+  /* Even more compact for very small screens */
+  .MuiAppBar-root .MuiTypography-subtitle1 {
+    font-size: 1rem !important;
+  }
+}
+
+/* Mobile menu styling */
+.MuiMenu-paper {
+  margin-top: 8px;
+}
+
+.MuiMenuItem-root {
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.MuiMenuItem-root svg {
+  opacity: 0.7;
 }
 
 /* Enhanced animations */
@@ -332,19 +424,19 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(224, 213, 208, 0.3);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 122, 255, 0.2);
+  background: rgba(42, 127, 126, 0.3);
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 122, 255, 0.3);
+  background: rgba(42, 127, 126, 0.5);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
