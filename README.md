@@ -208,13 +208,14 @@ npm test
 
 ## 🎓 Portfolio Context
 
-This project showcases my journey from basic web development to implementing enterprise-grade patterns. Starting as a simple calendar for a code assessment, I transformed it into a production-ready application demonstrating:
+This project showcases my journey from basic web development to implementing enterprise-grade patterns. Starting as a simple calendar for a code assessment, I continued to develop it extensively to gain full knowledge of the .NET backend ecosystem and deployment cycle, while also transitioning to React from what I had previously been using in work. This transformation demonstrates:
 
 - **Backend Excellence**: Clean architecture with FastEndpoints, comprehensive middleware, and thread-safe operations
 - **Modern Frontend**: React with advanced state management, error handling, and performance optimization
 - **Full-Stack Integration**: Seamless API communication with resilience patterns
 - **Problem-Solving**: Addressed real-world challenges like rate limiting and infinite loops
 - **Best Practices**: Clean code, comprehensive testing, and documentation
+- **Continuous Learning**: Self-driven exploration of .NET Core and React best practices beyond the initial requirements
 
 ## 🔮 Future Enhancements
 
