@@ -233,4 +233,4 @@ This is a personal portfolio project. Feel free to explore the code and use it a
 
 ---
 
-Built with passion by Thomas Butler | [LinkedIn](https://linkedin.com/in/yourprofile) | [GitHub](https://github.com/yourusername)
+Built with passion by Thomas Butler | [LinkedIn](https://linkedin.com/in/thomasbutleruk) | [Commercial Website](https://thomasjbutler.me) | [Personal Website](https://thomasjbutler.github.io/ThomasJButler/)
