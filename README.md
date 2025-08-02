@@ -28,9 +28,9 @@ This calendar application goes beyond basic CRUD operations to demonstrate:
 <img width="1162" height="695" alt="image" src="https://github.com/user-attachments/assets/97213264-ed1a-49cd-988d-b319abaca798" />
 <img width="1351" height="559" alt="image" src="https://github.com/user-attachments/assets/865c7c31-f786-4d59-bd6d-ff32cef31748" />
 
-## Mobile (vertical stack) - I can improve this in a future update.
+## Mobile (vertical stack) 
 
-<img width="270" height="556" alt="image" src="https://github.com/user-attachments/assets/fdba327f-09b9-4bf4-95e3-785def1b22fa" />
+<img width="420" height="698" alt="image" src="https://github.com/user-attachments/assets/a12d4075-a0eb-4a88-9c1d-ea2a7bbd4994" />
 
 ## 🛠️ Technology Stack
 
