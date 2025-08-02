@@ -1,4 +1,4 @@
-# AWOL Calendar - Full-Stack Calendar Application
+# Dotnet Calendar - Full-Stack Calendar Application
 
 <img width="1490" alt="Calendar View with Analytics" src="https://github.com/user-attachments/assets/5a9aa088-e873-463d-b9a8-57ae3f9be311" />
 
