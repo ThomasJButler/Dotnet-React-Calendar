@@ -1,12 +1,27 @@
 # Dotnet Calendar - Full-Stack Calendar Application
 
-<img width="1490" alt="Calendar View with Analytics" src="https://github.com/user-attachments/assets/5a9aa088-e873-463d-b9a8-57ae3f9be311" />
+<img width="1492" height="776" alt="image" src="https://github.com/user-attachments/assets/f30de5da-86b2-4ff1-bab5-186bcaf26a5b" />
 
-<img width="514" alt="Mobile Responsive View" src="https://github.com/user-attachments/assets/6f543614-fd50-4f9f-a784-fea1dc8c2542" />
+## Bulk Event Import (from CSV)
+
+<img width="1480" height="772" alt="image" src="https://github.com/user-attachments/assets/99d12b08-68f6-4256-aba6-85e786c35468" />
+
+## Events added to API (from CSV)
+
+<img width="752" height="520" alt="image" src="https://github.com/user-attachments/assets/a6344575-0cd3-4473-8e0b-4aac321dfcbc" />
+
+## Event Metrics (yearly, after importing csv data)
+
+<img width="1162" height="695" alt="image" src="https://github.com/user-attachments/assets/97213264-ed1a-49cd-988d-b319abaca798" />
+<img width="1351" height="559" alt="image" src="https://github.com/user-attachments/assets/865c7c31-f786-4d59-bd6d-ff32cef31748" />
+
+## Mobile (vertical stack) - I can improve this in a future update.
+
+<img width="270" height="556" alt="image" src="https://github.com/user-attachments/assets/fdba327f-09b9-4bf4-95e3-785def1b22fa" />
 
 A production-ready calendar application showcasing modern web development with **React.js** and **.NET Core 9.0**, featuring real-time API analytics, advanced state management, and enterprise-grade error handling. This project demonstrates full-stack engineering capabilities with a particular emphasis on backend architecture and API design.
 
-🚀 **Live Demo**: [Frontend on Vercel](https://dotnet-react-calendar.vercel.app) | [Backend API on Render]
+🚀 **Live Demo**: [Frontend on Vercel](https://dotnet-react-calendar.vercel.app) | [Backend API on Render](https://dotnet-react-calendar.onrender.com/api/events)
 
 ## 🎯 Project Highlights
 
