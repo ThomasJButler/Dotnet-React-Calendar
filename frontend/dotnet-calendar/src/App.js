@@ -5,18 +5,20 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Calendar from './components/Calendar';
 import EventList from './components/EventList';
 import EventForm from './components/EventForm';
-// Lazy load heavy components for better performance
-const FreeTimeChart = lazy(() => import('./components/FreeTimeChart'));
-const AnalyticsDashboard = lazy(() => import('./components/AnalyticsDashboard'));
-const BulkEventManager = lazy(() => import('./components/BulkEventManager'));
 import EventSearch from './components/EventSearch';
 import ApiStatus from './components/ApiStatus';
 import ErrorBoundary from './components/ErrorBoundary';
 import SkipNavigation from './components/common/SkipNavigation';
+import PerformanceMonitor from './components/PerformanceMonitor';
 import { EventProvider } from './context/EventContext';
 import { AppProvider } from './context/AppContext';
 import ToastContainer from './components/common/Toast';
 import './App.css';
+
+// Lazy load heavy components for better performance
+const FreeTimeChart = lazy(() => import('./components/FreeTimeChart'));
+const AnalyticsDashboard = lazy(() => import('./components/AnalyticsDashboard'));
+const BulkEventManager = lazy(() => import('./components/BulkEventManager'));
 
 /**
  * App component with theme and dark mode support

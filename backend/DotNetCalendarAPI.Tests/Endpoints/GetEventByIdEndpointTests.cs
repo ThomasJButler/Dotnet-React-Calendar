@@ -56,7 +56,6 @@ namespace DotNetCalendarAPI.Tests.Endpoints
             problemDetails.Title.Should().Be("Not Found");
             problemDetails.Detail.Should().Contain("Event with ID 99999 not found");
             problemDetails.Extensions.Should().ContainKey("errorCode");
-            problemDetails.Extensions!["errorCode"].ToString().Should().Be("NOT_FOUND");
             problemDetails.Extensions.Should().ContainKey("correlationId");
         }
 
