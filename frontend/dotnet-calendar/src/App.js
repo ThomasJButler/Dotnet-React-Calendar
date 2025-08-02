@@ -1,18 +1,24 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import { Container, Typography, Box, Button, AppBar, Toolbar, CssBaseline, IconButton, useMediaQuery } from '@mui/material';
-import { Add as AddIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon } from '@mui/icons-material';
+import { Add as AddIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon, Analytics as AnalyticsIcon, ImportExport as ImportExportIcon, Speed as SpeedIcon } from '@mui/icons-material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Calendar from './components/Calendar';
 import EventList from './components/EventList';
 import EventForm from './components/EventForm';
-import FreeTimeChart from './components/FreeTimeChart';
 import EventSearch from './components/EventSearch';
 import ApiStatus from './components/ApiStatus';
 import ErrorBoundary from './components/ErrorBoundary';
+import SkipNavigation from './components/common/SkipNavigation';
+import PerformanceMonitor from './components/PerformanceMonitor';
 import { EventProvider } from './context/EventContext';
 import { AppProvider } from './context/AppContext';
 import ToastContainer from './components/common/Toast';
 import './App.css';
+
+// Lazy load heavy components for better performance
+const FreeTimeChart = lazy(() => import('./components/FreeTimeChart'));
+const AnalyticsDashboard = lazy(() => import('./components/AnalyticsDashboard'));
+const BulkEventManager = lazy(() => import('./components/BulkEventManager'));
 
 /**
  * App component with theme and dark mode support
@@ -24,6 +30,9 @@ function App() {
   const [eventFormOpen, setEventFormOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [bulkManagerOpen, setBulkManagerOpen] = useState(false);
+  const [performanceMonitorOpen, setPerformanceMonitorOpen] = useState(false);
   
   // Use media query to detect system preference for dark mode
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -128,6 +137,7 @@ function App() {
       <ErrorBoundary>
         <AppProvider>
           <EventProvider>
+            <SkipNavigation />
             <ToastContainer />
             <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static" color="primary">
@@ -135,6 +145,36 @@ function App() {
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 .NET Backend Calendar
               </Typography>
+              
+              {/* Performance Monitor button */}
+              <IconButton
+                color="inherit"
+                onClick={() => setPerformanceMonitorOpen(true)}
+                sx={{ mr: 1 }}
+                aria-label="performance monitor"
+              >
+                <SpeedIcon />
+              </IconButton>
+              
+              {/* Import/Export button */}
+              <IconButton
+                color="inherit"
+                onClick={() => setBulkManagerOpen(true)}
+                sx={{ mr: 1 }}
+                aria-label="import export events"
+              >
+                <ImportExportIcon />
+              </IconButton>
+              
+              {/* Analytics toggle */}
+              <Button 
+                color="inherit" 
+                startIcon={<AnalyticsIcon />}
+                onClick={() => setShowAnalytics(!showAnalytics)}
+                sx={{ mr: 2 }}
+              >
+                {showAnalytics ? 'Calendar' : 'Analytics'}
+              </Button>
               
               {/* Dark mode toggle */}
               <IconButton 
@@ -158,14 +198,26 @@ function App() {
           </AppBar>
         </Box>
         
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          {/* Event Search - Always visible at top */}
-          <Box sx={{ mb: 3 }}>
-            <EventSearch />
-          </Box>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }} component="main" id="main-content">
+          {/* Event Search - Always visible at top when not in analytics mode */}
+          {!showAnalytics && (
+            <Box sx={{ mb: 3 }} id="search">
+              <EventSearch />
+            </Box>
+          )}
           
-          {/* Layout changes for mobile - show date and events above calendar */}
-          {isMobile ? (
+          {/* Show Analytics Dashboard or Calendar/Events view */}
+          {showAnalytics ? (
+            <Suspense fallback={
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
+                <Typography>Loading analytics...</Typography>
+              </Box>
+            }>
+              <AnalyticsDashboard />
+            </Suspense>
+          ) : (
+            /* Layout changes for mobile - show date and events above calendar */
+            isMobile ? (
             <>
               
               {/* Event list section */}
@@ -186,7 +238,13 @@ function App() {
               
               {/* Free Time Chart (mobile) */}
               <Box sx={{ mt: 3 }}>
-                <FreeTimeChart selectedDate={selectedDate} />
+                <Suspense fallback={
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                    <Typography>Loading chart...</Typography>
+                  </Box>
+                }>
+                  <FreeTimeChart selectedDate={selectedDate} />
+                </Suspense>
               </Box>
             </>
           ) : (
@@ -211,10 +269,17 @@ function App() {
                 
                 {/* Free Time Chart (desktop) */}
                 <Box>
-                  <FreeTimeChart selectedDate={selectedDate} />
+                  <Suspense fallback={
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                      <Typography>Loading chart...</Typography>
+                    </Box>
+                  }>
+                    <FreeTimeChart selectedDate={selectedDate} />
+                  </Suspense>
                 </Box>
               </Box>
             </Box>
+          )
           )}
           
           {/* Event form dialog */}
@@ -236,6 +301,22 @@ function App() {
         
         {/* API Status indicator - compact mode */}
         <ApiStatus compact />
+        
+        {/* Bulk Event Manager Dialog */}
+        <Suspense fallback={null}>
+          <BulkEventManager 
+            open={bulkManagerOpen} 
+            onClose={() => setBulkManagerOpen(false)} 
+          />
+        </Suspense>
+        
+        {/* Performance Monitor Dialog */}
+        <Suspense fallback={null}>
+          <PerformanceMonitor 
+            open={performanceMonitorOpen} 
+            onClose={() => setPerformanceMonitorOpen(false)} 
+          />
+        </Suspense>
         
           </EventProvider>
         </AppProvider>

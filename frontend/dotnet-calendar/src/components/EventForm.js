@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Button, 
   TextField, 
@@ -62,6 +62,10 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
   const [errors, setErrors] = useState({});
   const [showYearPicker, setShowYearPicker] = useState(false);
   const [yearPickerYear, setYearPickerYear] = useState(new Date().getFullYear());
+  
+  // Refs for focus management
+  const titleInputRef = useRef(null);
+  const firstErrorRef = useRef(null);
   
   // Loading states
   const creating = isLoading('create');
@@ -158,6 +162,18 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
     }
     
     setErrors(validation.errors);
+    
+    // Focus on first error field
+    if (!validation.isValid) {
+      setTimeout(() => {
+        if (validation.errors.title && titleInputRef.current) {
+          titleInputRef.current.focus();
+        } else if (firstErrorRef.current) {
+          firstErrorRef.current.focus();
+        }
+      }, 100);
+    }
+    
     return validation.isValid;
   };
 
@@ -283,12 +299,41 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
   // Generate minutes options (0-55, step 5)
   const minuteOptions = Array.from({ length: 12 }, (_, i) => i * 5);
 
+  // Focus title input when dialog opens
+  useEffect(() => {
+    if (open && titleInputRef.current) {
+      setTimeout(() => {
+        titleInputRef.current.focus();
+      }, 100);
+    }
+  }, [open]);
+
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle>{isEditing ? 'Edit Event' : 'Add New Event'}</DialogTitle>
-        <form onSubmit={handleSubmit}>
+      <Dialog 
+        open={open} 
+        onClose={onClose} 
+        maxWidth="sm" 
+        fullWidth
+        aria-labelledby="event-dialog-title"
+        aria-describedby="event-dialog-description"
+      >
+        <DialogTitle id="event-dialog-title">{isEditing ? 'Edit Event' : 'Add New Event'}</DialogTitle>
+        <form onSubmit={handleSubmit} noValidate>
           <DialogContent>
+            <Typography 
+              variant="srOnly" 
+              id="event-dialog-description"
+              sx={{ 
+                position: 'absolute', 
+                left: '-9999px',
+                width: '1px',
+                height: '1px',
+                overflow: 'hidden'
+              }}
+            >
+              {isEditing ? 'Edit the event details below. Press Tab to navigate between fields.' : 'Fill in the event details below. Press Tab to navigate between fields.'}
+            </Typography>
             {errors.overlap && (
               <Box sx={{ mb: 2 }}>
                 <Alert severity="error">{errors.overlap}</Alert>
@@ -298,26 +343,33 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
               <FormControl error={!!errors.title}>
                 <TextField
+                  inputRef={titleInputRef}
                   label="Title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   fullWidth
+                  required
                   error={!!errors.title}
+                  aria-invalid={!!errors.title}
+                  aria-describedby={errors.title ? "title-error" : undefined}
+                  aria-required="true"
                 />
-                {errors.title && <FormHelperText>{errors.title}</FormHelperText>}
+                {errors.title && <FormHelperText id="title-error" role="alert">{errors.title}</FormHelperText>}
               </FormControl>
               
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enGB}>
                 <FormControl error={!!errors.date}>
                   {showYearPicker ? (
                     <Box sx={{ mt: 2, mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1 }}>Select Year</Typography>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }} id="year-picker-label">Select Year</Typography>
                       <Box 
                         sx={{ 
                           display: 'grid', 
                           gridTemplateColumns: 'repeat(5, 1fr)',
                           gap: 1
                         }}
+                        role="group"
+                        aria-labelledby="year-picker-label"
                       >
                         {getYearOptions().map(year => (
                           <Button
@@ -334,6 +386,7 @@ const EventForm = ({ open, handleClose, event, isEditing, selectedDate }) => {
                         size="small" 
                         onClick={toggleYearPicker}
                         sx={{ mt: 2 }}
+                        aria-label="Back to date picker"
                       >
                         Back to Date Picker
                       </Button>

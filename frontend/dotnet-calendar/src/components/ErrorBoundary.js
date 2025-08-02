@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Box, Typography, Button, Paper, Container } from '@mui/material';
 import { Error as ErrorIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import errorTracking from '../services/errorTracking';
 
 /**
  * ErrorBoundary component to catch and display errors gracefully
@@ -32,8 +33,8 @@ class ErrorBoundary extends Component {
       errorCount: prevState.errorCount + 1
     }));
     
-    // Here you could also send error to a logging service
-    // logErrorToService(error, errorInfo);
+    // Send error to tracking service
+    errorTracking.trackComponentError(error, errorInfo, 'ErrorBoundary');
   }
 
   handleReset = () => {

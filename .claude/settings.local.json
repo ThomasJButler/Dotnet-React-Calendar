@@ -13,8 +13,11 @@
       "Bash(mkdir:*)",
       "Bash(npm test:*)",
       "Bash(npm run test-jest:*)",
+      "Bash(ls:*)",
       "Bash(npm run build:*)",
-      "Bash(npx eslint:*)"
+      "Bash(find:*)",
+      "Bash(npm start)",
+      "Bash(PORT=3001 npm start)"
     ],
     "deny": []
   }

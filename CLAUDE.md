@@ -119,3 +119,25 @@ Frontend uses React Context API pattern:
 - Sample data initialized on startup via `SampleDataService`
 - Date handling uses ISO 8601 format for API communication
 - Frontend expects backend at `http://localhost:5191`
+
+## Port Configuration
+
+- Frontend dev server runs on port 3000 by default
+- Port can be configured via `.env` file with `PORT=3000`
+- If port conflicts occur, use `npx kill-port 3000` to free the port
+- Backend API always runs on port 5191
+
+## Frontend v2.0 Enhancements
+
+The frontend has been enhanced with comprehensive features including:
+
+- **Enhanced API Client**: Circuit breaker, retry logic, request deduplication, caching
+- **Advanced State Management**: Granular loading states, optimistic updates, search/pagination
+- **UI/UX Components**: Loading spinners, skeleton loaders, toast notifications, error boundaries
+- **Search & Filtering**: Real-time search with debouncing, advanced filters, search history
+- **API Monitoring**: Connection status, circuit breaker state, rate limit visualization
+- **Performance**: Request deduplication, response caching, debounced search, lazy loading
+- **Analytics**: Event analytics dashboard, performance monitoring, Web Vitals tracking
+- **Bulk Operations**: CSV import/export for events
+
+See `frontend/dotnet-calendar/ENHANCEMENTS.md` for detailed feature documentation.

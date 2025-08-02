@@ -1,4 +1,5 @@
 import axios from 'axios';
+import errorTracking from './errorTracking';
 
 // Circuit breaker implementation
 class CircuitBreaker {
@@ -251,6 +252,14 @@ class EnhancedApiClient {
           console.error(`[API] Error ${error.response?.status} in ${duration}ms`, {
             url: error.config.url,
             message: error.message,
+            correlationId: error.response?.headers['x-correlation-id']
+          });
+          
+          // Track API errors
+          errorTracking.trackApiError(error, error.config.url, {
+            method: error.config.method,
+            data: error.config.data,
+            duration,
             correlationId: error.response?.headers['x-correlation-id']
           });
         }
