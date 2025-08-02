@@ -6,7 +6,7 @@
 
 A production-ready calendar application showcasing modern web development with **React.js** and **.NET Core 9.0**, featuring real-time API analytics, advanced state management, and enterprise-grade error handling. This project demonstrates full-stack engineering capabilities with a particular emphasis on backend architecture and API design.
 
-🚀 **Live Demo**: [Frontend on Vercel](https://your-app.vercel.app) | [Backend API on Azure](https://your-api.azurewebsites.net)
+🚀 **Live Demo**: [Frontend on Vercel](https://dotnet-react-calendar.vercel.app) | [Backend API on Render]
 
 ## 🎯 Project Highlights
 
