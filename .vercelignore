@@ -1,0 +1,30 @@
+# Ignore backend directory
+backend/
+
+# Ignore planning directory
+planning/
+
+# Ignore solution files
+*.sln
+
+# Ignore markdown files in root (except README)
+CLAUDE.md
+DEPLOYMENT.md
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore any logs
+*.log
+logs/
+
+# Ignore test coverage
+coverage/
+*.coverage
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.suo
+*.user
