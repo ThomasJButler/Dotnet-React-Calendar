@@ -90,31 +90,62 @@ class RetryManager {
     this.baseDelay = options.baseDelay || 1000;
     this.maxDelay = options.maxDelay || 30000;
     this.factor = options.factor || 2;
+    this.onServerCold = options.onServerCold || null;
   }
 
   async execute(fn, context = {}) {
     let lastError;
+    let serverWarmingAttempts = 0;
     
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
+        // If we were warming, notify that we're connected
+        if (serverWarmingAttempts > 0 && this.onServerCold) {
+          this.onServerCold(false, 0);
+        }
         return await fn();
       } catch (error) {
         lastError = error;
         
-        // Don't retry on client errors (4xx)
-        if (error.response && error.response.status >= 400 && error.response.status < 500) {
+        // Check if server needs warming
+        const isServerCold = this.isServerCold(error);
+        if (isServerCold && this.onServerCold) {
+          serverWarmingAttempts++;
+          this.onServerCold(true, serverWarmingAttempts);
+        }
+        
+        // Don't retry on client errors (4xx) unless it's server warming
+        if (!isServerCold && error.response && error.response.status >= 400 && error.response.status < 500) {
           throw error;
         }
         
-        if (attempt < this.maxRetries) {
-          const delay = this.calculateDelay(attempt);
-          console.log(`Retry attempt ${attempt + 1}/${this.maxRetries} after ${delay}ms`);
+        if (attempt < this.maxRetries || (isServerCold && serverWarmingAttempts < 10)) {
+          const delay = isServerCold ? 3000 : this.calculateDelay(attempt); // Shorter delay for cold starts
+          console.log(`${isServerCold ? 'Server warming' : 'Retry'} attempt ${attempt + 1}/${this.maxRetries} after ${delay}ms`);
           await this.sleep(delay);
         }
       }
     }
     
+    // If we failed after all attempts, notify warming is done
+    if (serverWarmingAttempts > 0 && this.onServerCold) {
+      this.onServerCold(false, 0);
+    }
+    
     throw lastError;
+  }
+
+  isServerCold(error) {
+    if (!error.response && error.code === 'ECONNABORTED') {
+      return true; // Timeout likely due to cold start
+    }
+    if (error.response?.status === 503) {
+      return true; // Service unavailable
+    }
+    if (!error.response && error.message.includes('Network Error')) {
+      return true; // Could be cold start
+    }
+    return false;
   }
 
   calculateDelay(attempt) {
@@ -188,6 +219,14 @@ class EnhancedApiClient {
     
     // Request deduplication
     this.pendingRequests = new Map();
+    
+    // Server warming state
+    this.serverWarmingState = {
+      isWarming: false,
+      attempt: 0,
+      maxAttempts: 10,
+      listeners: new Set()
+    };
     
     // Create axios instance
     this.client = axios.create({
@@ -386,8 +425,48 @@ class EnhancedApiClient {
       circuitBreakerState: this.circuitBreaker.state,
       cacheSize: this.cacheManager.cache.size,
       pendingRequests: this.pendingRequests.size,
-      queuedRequests: this.requestQueue.queue.length
+      queuedRequests: this.requestQueue.queue.length,
+      serverWarming: this.serverWarmingState.isWarming
     };
+  }
+
+  // Server warming management
+  setServerWarming(isWarming, attempt = 0) {
+    this.serverWarmingState.isWarming = isWarming;
+    this.serverWarmingState.attempt = attempt;
+    this.notifyWarmingListeners();
+  }
+
+  onServerWarmingChange(listener) {
+    this.serverWarmingState.listeners.add(listener);
+    // Return unsubscribe function
+    return () => {
+      this.serverWarmingState.listeners.delete(listener);
+    };
+  }
+
+  notifyWarmingListeners() {
+    this.serverWarmingState.listeners.forEach(listener => {
+      listener({
+        isWarming: this.serverWarmingState.isWarming,
+        attempt: this.serverWarmingState.attempt,
+        maxAttempts: this.serverWarmingState.maxAttempts
+      });
+    });
+  }
+
+  // Check if server is cold (needs warming)
+  isServerCold(error) {
+    if (!error.response && error.code === 'ECONNABORTED') {
+      return true; // Timeout likely due to cold start
+    }
+    if (error.response?.status === 503) {
+      return true; // Service unavailable
+    }
+    if (!error.response && error.message.includes('Network Error')) {
+      return true; // Could be cold start
+    }
+    return false;
   }
 }
 
@@ -397,7 +476,8 @@ const apiClient = new EnhancedApiClient({
   retry: {
     maxRetries: 3,
     baseDelay: 1000,
-    maxDelay: 10000
+    maxDelay: 10000,
+    onServerCold: null // Will be set below
   },
   circuitBreaker: {
     failureThreshold: 5,
@@ -405,5 +485,10 @@ const apiClient = new EnhancedApiClient({
   },
   cacheTTL: 300000 // 5 minutes
 });
+
+// Set up server cold callback after instance is created
+apiClient.retryManager.onServerCold = (isWarming, attempt) => {
+  apiClient.setServerWarming(isWarming, attempt);
+};
 
 export default apiClient;

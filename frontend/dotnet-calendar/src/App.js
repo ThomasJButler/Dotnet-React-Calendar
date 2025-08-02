@@ -1,4 +1,4 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo, lazy, Suspense, useEffect } from 'react';
 import { Container, Typography, Box, Button, AppBar, Toolbar, CssBaseline, IconButton, useMediaQuery } from '@mui/material';
 import { Add as AddIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon, Analytics as AnalyticsIcon, ImportExport as ImportExportIcon, Speed as SpeedIcon } from '@mui/icons-material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -9,9 +9,11 @@ import EventSearch from './components/EventSearch';
 import ApiStatus from './components/ApiStatus';
 import ErrorBoundary from './components/ErrorBoundary';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import ServerWarmingLoader from './components/ServerWarmingLoader';
 import { EventProvider } from './context/EventContext';
 import { AppProvider } from './context/AppContext';
 import ToastContainer from './components/common/Toast';
+import apiClient from './services/apiClient';
 import './App.css';
 
 // Lazy load heavy components for better performance
@@ -47,6 +49,11 @@ function App() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [bulkManagerOpen, setBulkManagerOpen] = useState(false);
   const [performanceMonitorOpen, setPerformanceMonitorOpen] = useState(false);
+  const [serverWarmingState, setServerWarmingState] = useState({
+    isWarming: false,
+    attempt: 0,
+    maxAttempts: 10
+  });
   
   // Use media query to detect system preference for dark mode
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -105,6 +112,15 @@ function App() {
     setDarkMode(!darkMode);
   };
 
+  // Subscribe to server warming state changes
+  useEffect(() => {
+    const unsubscribe = apiClient.onServerWarmingChange((state) => {
+      setServerWarmingState(state);
+    });
+
+    return unsubscribe;
+  }, []);
+
   /**
    * Handle date selection from calendar
    * @param {Date} date - The selected date
@@ -152,6 +168,11 @@ function App() {
         <AppProvider>
           <EventProvider>
             <ToastContainer />
+            <ServerWarmingLoader 
+              isWarming={serverWarmingState.isWarming}
+              attempt={serverWarmingState.attempt}
+              maxAttempts={serverWarmingState.maxAttempts}
+            />
             <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static" color="primary">
             <Toolbar>
