@@ -1,5 +1,18 @@
 # Dotnet Calendar - Full-Stack Calendar Application
 
+A production-ready calendar application showcasing modern web development with **React.js** and **.NET Core 9.0**, featuring real-time API analytics, advanced state management, and enterprise-grade error handling. This project demonstrates full-stack engineering capabilities with a particular emphasis on backend architecture and API design.
+
+🚀 **Live Demo**: [Frontend on Vercel](https://dotnet-react-calendar.vercel.app) | [Backend API on Render](https://dotnet-react-calendar.onrender.com/api/events)
+
+## 🎯 Project Highlights
+
+This calendar application goes beyond basic CRUD operations to demonstrate:
+- **Production-Grade API Client**: Circuit breaker pattern, retry logic, request deduplication
+- **Real-Time API Analytics**: Live monitoring dashboard showing API health, response times, and circuit breaker status
+- **Advanced State Management**: Optimistic updates, granular loading states, and intelligent caching
+- **Enterprise Error Handling**: Toast notifications, error boundaries, and graceful degradation
+- **Performance Optimization**: Lazy loading, debounced search, and response caching
+
 <img width="1492" height="776" alt="image" src="https://github.com/user-attachments/assets/f30de5da-86b2-4ff1-bab5-186bcaf26a5b" />
 
 ## Bulk Event Import (from CSV)
@@ -18,19 +31,6 @@
 ## Mobile (vertical stack) - I can improve this in a future update.
 
 <img width="270" height="556" alt="image" src="https://github.com/user-attachments/assets/fdba327f-09b9-4bf4-95e3-785def1b22fa" />
-
-A production-ready calendar application showcasing modern web development with **React.js** and **.NET Core 9.0**, featuring real-time API analytics, advanced state management, and enterprise-grade error handling. This project demonstrates full-stack engineering capabilities with a particular emphasis on backend architecture and API design.
-
-🚀 **Live Demo**: [Frontend on Vercel](https://dotnet-react-calendar.vercel.app) | [Backend API on Render](https://dotnet-react-calendar.onrender.com/api/events)
-
-## 🎯 Project Highlights
-
-This calendar application goes beyond basic CRUD operations to demonstrate:
-- **Production-Grade API Client**: Circuit breaker pattern, retry logic, request deduplication
-- **Real-Time API Analytics**: Live monitoring dashboard showing API health, response times, and circuit breaker status
-- **Advanced State Management**: Optimistic updates, granular loading states, and intelligent caching
-- **Enterprise Error Handling**: Toast notifications, error boundaries, and graceful degradation
-- **Performance Optimization**: Lazy loading, debounced search, and response caching
 
 ## 🛠️ Technology Stack
 
