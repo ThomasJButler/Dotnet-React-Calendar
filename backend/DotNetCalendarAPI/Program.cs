@@ -33,7 +33,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CalendarPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(
+            "http://localhost:3000",
+            "https://dotnet-react-calendar.vercel.app"
+            )
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials()
