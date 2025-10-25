@@ -1,7 +1,8 @@
 /**
- * Error Tracking Service
- * Provides integration with error tracking services like Sentry
- * Falls back to console logging in development
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Error tracking service with Sentry integration for production monitoring.
+ *              Falls back to console logging in development.
  */
 
 class ErrorTrackingService {
@@ -14,19 +15,17 @@ class ErrorTrackingService {
   }
 
   /**
-   * Initialize error tracking service
-   * @param {Object} config - Configuration options
+   * @param {Object} [config={}] - Configuration options
    */
   initialize(config = {}) {
     const { dsn, environment, release, userId } = config;
-    
+
     if (this.isDevelopment && !config.enableInDev) {
       console.log('[ErrorTracking] Running in development mode - errors will be logged to console');
       this.initialized = true;
       return;
     }
 
-    // Check if Sentry is available
     if (window.Sentry && dsn) {
       try {
         window.Sentry.init({
@@ -44,20 +43,18 @@ class ErrorTrackingService {
           replaysSessionSampleRate: 0.1,
           replaysOnErrorSampleRate: 1.0,
           beforeSend: (event, hint) => {
-            // Filter out certain errors
             if (this.shouldFilterError(event, hint)) {
               return null;
             }
             return event;
           },
         });
-        
+
         this.initialized = true;
         this.setUserId(userId);
-        
-        // Process queued errors
+
         this.processErrorQueue();
-        
+
         console.log('[ErrorTracking] Sentry initialized successfully');
       } catch (error) {
         console.error('[ErrorTracking] Failed to initialize Sentry:', error);
@@ -69,35 +66,31 @@ class ErrorTrackingService {
   }
 
   /**
-   * Check if error should be filtered
+   * @param {Object} event - Sentry event
+   * @param {Object} hint - Event hint
+   * @return {boolean} True if error should be filtered
    */
   shouldFilterError(event, hint) {
     const error = hint.originalException;
-    
-    // Filter network errors that are expected
-    if (error?.message?.includes('NetworkError') || 
+
+    if (error?.message?.includes('NetworkError') ||
         error?.message?.includes('Failed to fetch')) {
       return true;
     }
-    
-    // Filter ResizeObserver errors (common and usually harmless)
+
     if (error?.message?.includes('ResizeObserver loop limit exceeded')) {
       return true;
     }
-    
-    // Filter errors from browser extensions
+
     if (event.exception?.values?.[0]?.stacktrace?.frames?.some(
       frame => frame.filename?.includes('extension://')
     )) {
       return true;
     }
-    
+
     return false;
   }
 
-  /**
-   * Process queued errors
-   */
   processErrorQueue() {
     while (this.errorQueue.length > 0) {
       const { method, args } = this.errorQueue.shift();
@@ -106,18 +99,18 @@ class ErrorTrackingService {
   }
 
   /**
-   * Queue error if not initialized
+   * @param {string} method - Method name
+   * @param {Array} args - Arguments
    */
   queueError(method, args) {
-    if (this.errorQueue.length < 100) { // Limit queue size
+    if (this.errorQueue.length < 100) {
       this.errorQueue.push({ method, args });
     }
   }
 
   /**
-   * Capture exception
-   * @param {Error} error - The error to capture
-   * @param {Object} context - Additional context
+   * @param {Error} error - Error to capture
+   * @param {Object} [context={}] - Additional context
    */
   captureException(error, context = {}) {
     if (!this.initialized) {
@@ -150,10 +143,9 @@ class ErrorTrackingService {
   }
 
   /**
-   * Capture message
-   * @param {string} message - The message to capture
-   * @param {string} level - Severity level
-   * @param {Object} context - Additional context
+   * @param {string} message - Message to capture
+   * @param {string} [level='info'] - Severity level
+   * @param {Object} [context={}] - Additional context
    */
   captureMessage(message, level = 'info', context = {}) {
     if (!this.initialized) {
@@ -183,13 +175,12 @@ class ErrorTrackingService {
   }
 
   /**
-   * Set user context
    * @param {string} userId - User identifier
-   * @param {Object} userData - Additional user data
+   * @param {Object} [userData={}] - Additional user data
    */
   setUserId(userId, userData = {}) {
     this.userId = userId;
-    
+
     if (window.Sentry) {
       window.Sentry.setUser({
         id: userId,
@@ -199,19 +190,17 @@ class ErrorTrackingService {
   }
 
   /**
-   * Set global metadata
    * @param {Object} metadata - Metadata to include with all errors
    */
   setMetadata(metadata) {
     this.metadata = { ...this.metadata, ...metadata };
-    
+
     if (window.Sentry) {
       window.Sentry.setContext('metadata', this.metadata);
     }
   }
 
   /**
-   * Add breadcrumb for debugging
    * @param {Object} breadcrumb - Breadcrumb data
    */
   addBreadcrumb(breadcrumb) {
@@ -229,10 +218,9 @@ class ErrorTrackingService {
   }
 
   /**
-   * Track API errors
-   * @param {Object} error - API error object
+   * @param {Object} error - API error
    * @param {string} endpoint - API endpoint
-   * @param {Object} request - Request details
+   * @param {Object} [request={}] - Request details
    */
   trackApiError(error, endpoint, request = {}) {
     const context = {
@@ -250,8 +238,7 @@ class ErrorTrackingService {
   }
 
   /**
-   * Track React component errors
-   * @param {Error} error - The error
+   * @param {Error} error - Component error
    * @param {Object} errorInfo - React error info
    * @param {string} componentName - Component name
    */
@@ -267,10 +254,9 @@ class ErrorTrackingService {
   }
 
   /**
-   * Track performance issues
    * @param {string} metric - Performance metric name
    * @param {number} value - Metric value
-   * @param {Object} context - Additional context
+   * @param {Object} [context={}] - Additional context
    */
   trackPerformance(metric, value, context = {}) {
     if (value > this.getPerformanceThreshold(metric)) {
@@ -288,20 +274,22 @@ class ErrorTrackingService {
   }
 
   /**
-   * Get performance threshold for metric
+   * @param {string} metric - Metric name
+   * @return {number} Threshold in milliseconds
    */
   getPerformanceThreshold(metric) {
     const thresholds = {
       'api.response': 3000, // 3 seconds
-      'component.render': 500, // 500ms
-      'route.transition': 1000, // 1 second
+      'component.render': 500,
+      'route.transition': 1000,
     };
-    
+
     return thresholds[metric] || 1000;
   }
 
   /**
-   * Create error boundary handler
+   * @param {string} componentName - Component name
+   * @return {Function} Error handler function
    */
   createErrorBoundaryHandler(componentName) {
     return (error, errorInfo) => {
@@ -310,7 +298,9 @@ class ErrorTrackingService {
   }
 
   /**
-   * Wrap async function with error tracking
+   * @param {Function} fn - Async function to wrap
+   * @param {Object} [context={}] - Additional context
+   * @return {Function} Wrapped function
    */
   wrapAsync(fn, context = {}) {
     return async (...args) => {
@@ -327,9 +317,6 @@ class ErrorTrackingService {
     };
   }
 
-  /**
-   * Test error tracking
-   */
   testError() {
     this.captureMessage('Test error tracking message', 'info', {
       test: true,
@@ -338,10 +325,8 @@ class ErrorTrackingService {
   }
 }
 
-// Create singleton instance
 const errorTracking = new ErrorTrackingService();
 
-// Auto-initialize in production with env variables
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_SENTRY_DSN) {
   errorTracking.initialize({
     dsn: process.env.REACT_APP_SENTRY_DSN,
