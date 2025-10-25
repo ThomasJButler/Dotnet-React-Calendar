@@ -1,3 +1,9 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: FastEndpoint for advanced event searching with filters, sorting, and pagination.
+/// </summary>
+
 using FastEndpoints;
 using DotNetCalendarAPI.Models.Requests;
 using DotNetCalendarAPI.Models.Responses;
@@ -28,11 +34,8 @@ namespace DotNetCalendarAPI.Endpoints
         public override async Task HandleAsync(SearchEventsRequest req, CancellationToken ct)
         {
             var allEvents = _eventService.GetAllEvents();
-            
-            // Apply search filters
             var filteredEvents = allEvents.AsEnumerable();
 
-            // Text search
             if (!string.IsNullOrWhiteSpace(req.Query))
             {
                 var query = req.Query.ToLower();
@@ -41,7 +44,6 @@ namespace DotNetCalendarAPI.Endpoints
                     (e.Description?.ToLower().Contains(query) ?? false));
             }
 
-            // Date range filter
             if (req.StartDate.HasValue)
             {
                 filteredEvents = filteredEvents.Where(e => e.Date >= req.StartDate.Value);
@@ -52,7 +54,6 @@ namespace DotNetCalendarAPI.Endpoints
                 filteredEvents = filteredEvents.Where(e => e.Date <= req.EndDate.Value);
             }
 
-            // Time of day filter
             if (!string.IsNullOrWhiteSpace(req.TimeOfDay))
             {
                 filteredEvents = req.TimeOfDay.ToLower() switch
@@ -64,7 +65,6 @@ namespace DotNetCalendarAPI.Endpoints
                 };
             }
 
-            // Duration filter
             if (req.MinDuration.HasValue)
             {
                 filteredEvents = filteredEvents.Where(e => e.Duration >= req.MinDuration.Value);
@@ -77,7 +77,6 @@ namespace DotNetCalendarAPI.Endpoints
 
             var eventsList = filteredEvents.ToList();
 
-            // Apply sorting
             eventsList = req.SortBy?.ToLower() switch
             {
                 "date" => req.SortDescending ? 
@@ -92,11 +91,9 @@ namespace DotNetCalendarAPI.Endpoints
                 _ => eventsList.OrderBy(e => e.Date).ThenBy(e => e.Time).ToList()
             };
 
-            // Calculate pagination
             var totalCount = eventsList.Count;
             var totalPages = (int)Math.Ceiling(totalCount / (double)req.PageSize);
-            
-            // Apply pagination
+
             var paginatedEvents = eventsList
                 .Skip((req.Page - 1) * req.PageSize)
                 .Take(req.PageSize)
@@ -113,8 +110,7 @@ namespace DotNetCalendarAPI.Endpoints
                 HasNext = req.Page < totalPages,
                 HasPrevious = req.Page > 1
             };
-            
-            // Add search metadata headers
+
             HttpContext.Response.Headers.Append("X-Search-Query", req.Query ?? "");
             HttpContext.Response.Headers.Append("X-Total-Count", totalCount.ToString());
             

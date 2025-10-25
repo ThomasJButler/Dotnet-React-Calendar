@@ -1,3 +1,10 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Provides sample calendar event data for demonstration and testing.
+///              Initialises the event service with UK-specific sample events.
+/// </summary>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +18,6 @@ namespace DotNetCalendarAPI.Services
         {
             var events = new List<Event>
             {
-                // January 2025 events
                 new Event
                 {
                     Title = "New Year's Day",
@@ -75,8 +81,7 @@ namespace DotNetCalendarAPI.Services
                     Time = "18:30",
                     Description = "JavaScript advanced techniques module"
                 },
-                
-                // February 2025 events
+
                 new Event
                 {
                     Title = "Monthly review",
@@ -161,8 +166,7 @@ namespace DotNetCalendarAPI.Services
                     Time = "18:00",
                     Description = "Final project presentation"
                 },
-                
-                // March 2025 events
+
                 new Event
                 {
                     Title = "Monthly review",
@@ -226,7 +230,6 @@ namespace DotNetCalendarAPI.Services
                     Time = "14:30",
                     Description = "Regular checkup and cleaning"
                 },
-                // Add multiple events on the same day to test busy day color coding
                 new Event
                 {
                     Title = "Team meeting",

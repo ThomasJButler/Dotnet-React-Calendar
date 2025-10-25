@@ -1,3 +1,10 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Thread-safe event management service using ConcurrentDictionary.
+///              Handles CRUD operations, overlap detection, and ID generation.
+/// </summary>
+
 using System.Collections.Generic;
 using System.Linq;
 using DotNetCalendarAPI.Models;
@@ -38,14 +45,13 @@ namespace DotNetCalendarAPI.Services
         }
 
         /// <summary>
-        /// Checks if an event overlaps with existing events
+        /// Detects if an event overlaps with existing events on the same day
         /// </summary>
         /// <param name="eventToCheck">The event to check for overlaps</param>
-        /// <param name="excludeEventId">Optional ID of an event to exclude from the check (useful for updates)</param>
-        /// <returns>True if the event overlaps with existing events, false otherwise</returns>
+        /// <param name="excludeEventId">Event ID to exclude from check (used when updating existing events)</param>
+        /// <returns>True if overlap detected, false otherwise</returns>
         public bool DoesEventOverlap(Event eventToCheck, int? excludeEventId = null)
         {
-            // Convert event time to DateTime
             var eventTime = TimeSpan.Zero;
             if (!string.IsNullOrEmpty(eventToCheck.Time))
             {
@@ -56,22 +62,18 @@ namespace DotNetCalendarAPI.Services
                 }
             }
 
-            // Use the event's duration (in minutes) - default to 60 minutes if not set
+            // Default to 60 minutes if duration not specified
             var durationMinutes = eventToCheck.Duration > 0 ? eventToCheck.Duration : 60;
             var eventStart = eventToCheck.Date.Date.Add(eventTime);
             var eventEnd = eventStart.AddMinutes(durationMinutes);
 
-            // Check for overlaps with other events on the same day
-            var hasOverlap = _events.Values.Any(e => 
-                e.Id != (excludeEventId ?? -1) && // Exclude the event being updated
-                e.Date.Date == eventToCheck.Date.Date && // Same day
-                !string.IsNullOrEmpty(e.Time) && // Has a time
-                ConvertTimeStringToDateTime(e.Date, e.Time, out DateTime otherEventStart) && // Successfully converted time
-                (
-                    // Get other event's duration (in minutes) - default to 60 minutes if not set
-                    (otherEventStart < eventEnd && 
-                     otherEventStart.AddMinutes(e.Duration > 0 ? e.Duration : 60) > eventStart)
-                )
+            var hasOverlap = _events.Values.Any(e =>
+                e.Id != (excludeEventId ?? -1) &&
+                e.Date.Date == eventToCheck.Date.Date &&
+                !string.IsNullOrEmpty(e.Time) &&
+                ConvertTimeStringToDateTime(e.Date, e.Time, out DateTime otherEventStart) &&
+                (otherEventStart < eventEnd &&
+                 otherEventStart.AddMinutes(e.Duration > 0 ? e.Duration : 60) > eventStart)
             );
 
             if (hasOverlap)
@@ -84,7 +86,7 @@ namespace DotNetCalendarAPI.Services
         }
 
         /// <summary>
-        /// Helper method to convert time string to DateTime
+        /// Converts time string (HH:mm format) to DateTime for overlap calculations
         /// </summary>
         private bool ConvertTimeStringToDateTime(DateTime date, string timeString, out DateTime result)
         {
@@ -136,7 +138,6 @@ namespace DotNetCalendarAPI.Services
                 return false;
             }
 
-            // Create updated event preserving the ID
             var newEvent = new Event
             {
                 Id = id,

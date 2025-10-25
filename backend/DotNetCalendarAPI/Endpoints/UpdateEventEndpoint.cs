@@ -1,3 +1,9 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: FastEndpoint for updating existing calendar events with overlap validation.
+/// </summary>
+
 using FastEndpoints;
 using DotNetCalendarAPI.Models.Requests;
 using DotNetCalendarAPI.Models.Responses;
@@ -24,24 +30,21 @@ namespace DotNetCalendarAPI.Endpoints
                 .Produces(400)
                 .Produces(404)
                 .WithTags("Events"));
-            
-            // Add validator
+
             Validator<UpdateEventValidator>();
         }
 
         public override async Task HandleAsync(UpdateEventRequest req, CancellationToken ct)
         {
             var eventToUpdate = req.ToEvent();
-            
-            // Check if the event exists
+
             var existingEvent = _eventService.GetEventById(req.Id);
             if (existingEvent == null)
             {
                 await SendNotFoundAsync(ct);
                 return;
             }
-            
-            // Check for overlapping events, excluding the current event
+
             if (_eventService.DoesEventOverlap(eventToUpdate, req.Id))
             {
                 AddError("Event overlaps with an existing event");

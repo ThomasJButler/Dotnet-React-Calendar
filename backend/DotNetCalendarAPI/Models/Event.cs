@@ -1,3 +1,9 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Domain model representing a calendar event with title, date, time, and duration.
+/// </summary>
+
 namespace DotNetCalendarAPI.Models
 {
     public class Event

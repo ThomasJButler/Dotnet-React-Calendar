@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Custom exception classes for API error handling with structured error responses
+/// </summary>
 namespace DotNetCalendarAPI.Infrastructure.Exceptions
 {
     public class ApiException : Exception

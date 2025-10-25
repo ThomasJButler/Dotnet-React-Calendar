@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Middleware for logging HTTP requests and responses with performance metrics
+/// </summary>
 using System.Diagnostics;
 
 namespace DotNetCalendarAPI.Infrastructure.Middleware

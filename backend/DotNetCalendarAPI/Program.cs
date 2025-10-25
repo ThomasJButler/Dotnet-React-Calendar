@@ -1,3 +1,10 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Application entry point and service configuration for the Calendar API.
+///              Configures FastEndpoints, middleware pipeline, rate limiting, and CORS.
+/// </summary>
+
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using DotNetCalendarAPI.Services;
@@ -16,7 +23,6 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
-// Core services
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument(o =>
 {
@@ -24,11 +30,10 @@ builder.Services.SwaggerDocument(o =>
     {
         s.Title = "DotNet Calendar API";
         s.Version = "v1";
-        s.Description = "A modern calendar API showcasing advanced API development techniques";
+        s.Description = "Calendar API with FastEndpoints, rate limiting, and event management";
     };
 });
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CalendarPolicy", policy =>
@@ -44,11 +49,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Response caching
 builder.Services.AddResponseCaching();
 builder.Services.AddMemoryCache();
 
-// Response compression
 builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
@@ -66,7 +69,6 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
     options.Level = CompressionLevel.SmallestSize;
 });
 
-// Rate limiting
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
 builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
 builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
@@ -74,31 +76,26 @@ builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>()
 builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 builder.Services.AddInMemoryRateLimiting();
 
-// Health checks
 builder.Services.AddHealthChecks()
     .AddCheck<ApiHealthCheck>("api_health");
 
-// Application services
 builder.Services.AddSingleton<EventService>();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// Initialize sample data only if not in testing environment
+// Initialise sample data for non-test environments
 if (!app.Environment.IsEnvironment("Testing"))
 {
     var eventService = app.Services.GetRequiredService<EventService>();
     SampleDataService.InitializeEvents(eventService);
 }
 
-// Configure middleware pipeline
 app.UseSerilogRequestLogging();
-
-// Custom middleware
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Security headers
+// Security headers to prevent XSS, clickjacking, and MIME sniffing
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
@@ -119,13 +116,11 @@ app.UseCors("CalendarPolicy");
 app.UseResponseCaching();
 app.UseIpRateLimiting();
 
-// Configure FastEndpoints
 app.UseFastEndpoints(c =>
 {
     c.Endpoints.RoutePrefix = "api";
 });
 
-// Health checks
 app.MapHealthChecks("/health");
 app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
 {
