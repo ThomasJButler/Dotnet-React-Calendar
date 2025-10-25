@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Main application component with theme management and lazy-loaded features.
+ */
+
 import React, { useState, useMemo, lazy, Suspense, useEffect } from 'react';
 import { Container, Typography, Box, Button, AppBar, Toolbar, CssBaseline, IconButton, useMediaQuery, Menu, MenuItem, Tooltip, Fab } from '@mui/material';
 import { Add as AddIcon, DarkMode as DarkModeIcon, LightMode as LightModeIcon, Analytics as AnalyticsIcon, ImportExport as ImportExportIcon, Speed as SpeedIcon, MoreVert as MoreVertIcon } from '@mui/icons-material';

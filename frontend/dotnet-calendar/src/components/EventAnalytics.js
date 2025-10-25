@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Analytics visualisation component for event data.
+ */
+
 import React, { useMemo, useState } from 'react';
 import {
   Paper,

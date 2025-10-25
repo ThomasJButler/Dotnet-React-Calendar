@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Debounce hook to delay function execution until after user stops typing.
+ */
+
 import { useState, useEffect } from 'react';
 
 /**

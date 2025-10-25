@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Component showing API connection status and health metrics.
+ */
+
 import React from 'react';
 import { 
   Box, 

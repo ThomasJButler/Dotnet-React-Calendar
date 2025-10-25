@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Loading component shown whilst API server warms up.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { 
   Box, 

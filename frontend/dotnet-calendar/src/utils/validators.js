@@ -1,4 +1,10 @@
 /**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Validation utilities for event data and form inputs.
+ */
+
+/**
  * Validation utilities for event data
  */
 

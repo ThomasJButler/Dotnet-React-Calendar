@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Custom hook for keyboard navigation support.
+ */
+
 import { useEffect, useCallback } from 'react';
 
 /**

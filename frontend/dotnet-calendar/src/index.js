@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Application entry point that renders the React app.
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

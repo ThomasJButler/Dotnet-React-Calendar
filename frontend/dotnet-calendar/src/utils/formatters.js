@@ -1,4 +1,10 @@
 /**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Formatting utilities for dates, times, and display values.
+ */
+
+/**
  * Formatting utilities for dates, times, and other data
  */
 

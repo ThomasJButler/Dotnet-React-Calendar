@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description List component displaying events for a selected date.
+ */
+
 import React, { useRef, lazy, Suspense } from 'react';
 import { 
   List, 
