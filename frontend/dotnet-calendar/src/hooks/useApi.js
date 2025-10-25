@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Custom hook for API requests with loading and error states.
+ */
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 

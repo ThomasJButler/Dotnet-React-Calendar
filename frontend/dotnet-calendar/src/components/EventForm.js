@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Form component for creating and editing calendar events.
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Button, 

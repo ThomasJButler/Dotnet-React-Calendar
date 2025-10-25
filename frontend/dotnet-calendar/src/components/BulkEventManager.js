@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Component for bulk importing and exporting events via CSV.
+ */
+
 import React, { useState, useRef } from 'react';
 import {
   Paper,

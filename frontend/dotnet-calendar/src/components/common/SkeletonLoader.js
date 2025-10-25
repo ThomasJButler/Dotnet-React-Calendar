@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Skeleton loading placeholder component.
+ */
+
 import React from 'react';
 import { Skeleton, Box, Card, CardContent } from '@mui/material';
 

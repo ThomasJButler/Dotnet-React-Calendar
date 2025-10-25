@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Monthly calendar view with event display and navigation.
+ */
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Paper, 

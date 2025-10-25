@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Component for monitoring and displaying Core Web Vitals.
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   Paper,

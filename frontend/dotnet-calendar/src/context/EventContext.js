@@ -1,19 +1,24 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description React context provider for global event state management.
+ *              Handles CRUD operations with optimistic updates and rollback support.
+ */
+
 import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react';
 import EventService from '../services/eventService';
 
-// Create the context
 const EventContext = createContext();
 
 /**
- * EventProvider component to wrap the application and provide event state
- * @param {Object} props - Component props
- * @returns {JSX.Element} Provider component
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components
+ * @return {JSX.Element}
+ * @constructor
  */
 export const EventProvider = ({ children }) => {
-  // State for events
   const [events, setEvents] = useState([]);
-  
-  // Granular loading states
+
   const [loadingStates, setLoadingStates] = useState({
     fetch: false,
     create: false,
@@ -22,8 +27,7 @@ export const EventProvider = ({ children }) => {
     search: false,
     bulk: false
   });
-  
-  // Error states
+
   const [errors, setErrors] = useState({
     fetch: null,
     create: null,
@@ -32,39 +36,31 @@ export const EventProvider = ({ children }) => {
     search: null,
     bulk: null
   });
-  
-  // Search state
+
   const [searchParams, setSearchParams] = useState({});
   const [searchResults, setSearchResults] = useState(null);
-  
-  // Pagination state
+
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 100,
     totalCount: 0,
     totalPages: 0
   });
-  
-  // Optimistic update rollback references
+
   const rollbackRef = useRef({});
-  
-  // API statistics
   const [apiStats, setApiStats] = useState(null);
 
-  // Note: fetchEvents is defined below, so we'll move this useEffect after the function definition
-
-  // Update loading state helper
   const updateLoadingState = useCallback((operation, isLoading) => {
     setLoadingStates(prev => ({ ...prev, [operation]: isLoading }));
   }, []);
 
-  // Update error state helper
   const updateErrorState = useCallback((operation, error) => {
     setErrors(prev => ({ ...prev, [operation]: error }));
   }, []);
 
   /**
-   * Fetch all events from the API
+   * @param {Object} [options={}] - Fetch options
+   * @return {Promise<Array>} Event data
    */
   const fetchEvents = async (options = {}) => {
     try {
@@ -73,8 +69,7 @@ export const EventProvider = ({ children }) => {
       
       const data = await EventService.getAllEvents(options);
       setEvents(data);
-      
-      // Update pagination if available
+
       if (data._pagination) {
         setPagination(data._pagination);
       }
@@ -91,40 +86,35 @@ export const EventProvider = ({ children }) => {
   };
 
   /**
-   * Add a new event with optimistic update
-   * @param {Object} eventData - The event data to add
+   * @param {Object} eventData - Event data to create
+   * @return {Promise<Object>} Created event
    */
   const addEvent = async (eventData) => {
     try {
       updateLoadingState('create', true);
       updateErrorState('create', null);
-      
-      // Optimistic update - add temporary event
+
       const tempId = `temp-${Date.now()}`;
       const tempEvent = { ...eventData, id: tempId, isTemp: true };
       setEvents(prev => [...prev, tempEvent]);
-      
-      // Store rollback function
+
       rollbackRef.current[tempId] = () => {
         setEvents(prev => prev.filter(e => e.id !== tempId));
       };
-      
-      // Create actual event
+
       const newEvent = await EventService.createEvent(eventData);
-      
-      // Replace temp event with real one
       setEvents(prev => prev.map(e => e.id === tempId ? newEvent : e));
       delete rollbackRef.current[tempId];
-      
+
+
       return newEvent;
     } catch (err) {
-      // Rollback optimistic update
       const tempId = Object.keys(rollbackRef.current).find(key => key.startsWith('temp-'));
       if (tempId && rollbackRef.current[tempId]) {
         rollbackRef.current[tempId]();
         delete rollbackRef.current[tempId];
       }
-      
+
       const errorMessage = err.message || 'Failed to add event. Please try again.';
       updateErrorState('create', errorMessage);
       console.error('Error in addEvent:', err);

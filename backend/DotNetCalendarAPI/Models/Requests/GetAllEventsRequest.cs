@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Request model for retrieving events with pagination and filtering
+/// </summary>
 namespace DotNetCalendarAPI.Models.Requests
 {
     public class GetAllEventsRequest

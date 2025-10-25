@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Generic paginated response wrapper for API collections
+/// </summary>
 namespace DotNetCalendarAPI.Models.Responses
 {
     public class PaginatedResponse<T>

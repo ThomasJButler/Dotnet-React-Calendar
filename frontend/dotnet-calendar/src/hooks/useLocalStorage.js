@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Custom hook for persisting state to localStorage.
+ */
+
 import { useState, useCallback } from 'react';
 
 /**

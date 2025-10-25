@@ -1,7 +1,13 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description API client with circuit breaker, request queue, retry logic, and caching.
+ *              Provides resilient HTTP communication with the backend API.
+ */
+
 import axios from 'axios';
 import errorTracking from './errorTracking';
 
-// Circuit breaker implementation
 class CircuitBreaker {
   constructor(options = {}) {
     this.failureThreshold = options.failureThreshold || 5;

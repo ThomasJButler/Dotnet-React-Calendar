@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Response model for calendar event data transfer
+/// </summary>
 using DotNetCalendarAPI.Models;
 
 namespace DotNetCalendarAPI.Models.Responses

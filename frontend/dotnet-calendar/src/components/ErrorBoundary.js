@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Error boundary component for catching and displaying React errors.
+ */
+
 import React, { Component } from 'react';
 import { Box, Typography, Button, Paper, Container } from '@mui/material';
 import { Error as ErrorIcon, Refresh as RefreshIcon } from '@mui/icons-material';

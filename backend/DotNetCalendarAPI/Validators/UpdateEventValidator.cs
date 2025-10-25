@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Validation rules for update event requests
+/// </summary>
 using FastEndpoints;
 using FluentValidation;
 using DotNetCalendarAPI.Models.Requests;

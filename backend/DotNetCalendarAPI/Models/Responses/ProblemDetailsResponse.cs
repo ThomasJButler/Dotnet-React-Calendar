@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: RFC 7807 problem details response model for error handling
+/// </summary>
 namespace DotNetCalendarAPI.Models.Responses
 {
     public class ProblemDetailsResponse

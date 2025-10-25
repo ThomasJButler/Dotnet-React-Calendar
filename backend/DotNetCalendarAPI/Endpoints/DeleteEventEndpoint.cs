@@ -1,3 +1,9 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: FastEndpoint for deleting calendar events by ID.
+/// </summary>
+
 using FastEndpoints;
 using DotNetCalendarAPI.Services;
 

@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Search component with advanced filtering options.
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,

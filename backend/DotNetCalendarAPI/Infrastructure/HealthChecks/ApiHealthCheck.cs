@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Health check implementation for monitoring API availability and status
+/// </summary>
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace DotNetCalendarAPI.Infrastructure.HealthChecks

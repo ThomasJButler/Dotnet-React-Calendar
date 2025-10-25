@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Chart component showing free time analysis.
+ */
+
 import React, { useMemo } from 'react';
 import { 
   PieChart, 

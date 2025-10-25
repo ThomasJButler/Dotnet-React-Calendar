@@ -1,4 +1,10 @@
 /**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Error handling utilities for consistent error management across the application.
+ */
+
+/**
  * Error handling utilities
  */
 

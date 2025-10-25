@@ -1,3 +1,9 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: FastEndpoint for retrieving single events by ID with ETag caching support.
+/// </summary>
+
 using FastEndpoints;
 using DotNetCalendarAPI.Models.Responses;
 using DotNetCalendarAPI.Services;
@@ -36,13 +42,12 @@ namespace DotNetCalendarAPI.Endpoints
                 throw new NotFoundException($"Event with ID {req.Id} not found", 
                     new { eventId = req.Id });
             }
-            
-            // Add ETag for caching
+
+            // ETag format allows client-side caching for 5 minutes
             var etag = $"\"{evt.Id}-{evt.Title.GetHashCode()}-{evt.Date.Ticks}\"";
             HttpContext.Response.Headers.Append("ETag", etag);
             HttpContext.Response.Headers.Append("Cache-Control", "private, max-age=300");
-            
-            // Check if client has cached version
+
             if (HttpContext.Request.Headers.IfNoneMatch == etag)
             {
                 await SendNoContentAsync(ct);

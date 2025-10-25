@@ -1,3 +1,8 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: Middleware for centralised exception handling with RFC 7807 problem details responses
+/// </summary>
 using System.Net;
 using System.Text.Json;
 using DotNetCalendarAPI.Infrastructure.Exceptions;

@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Performance monitoring dashboard for API and render metrics.
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,

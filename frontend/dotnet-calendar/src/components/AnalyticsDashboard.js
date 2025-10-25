@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Dashboard displaying event analytics and statistics.
+ */
+
 import React, { useState } from 'react';
 import { Box, Tabs, Tab, Paper } from '@mui/material';
 import EventAnalytics from './EventAnalytics';

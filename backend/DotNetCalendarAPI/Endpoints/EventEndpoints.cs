@@ -1,3 +1,9 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: FastEndpoint for retrieving all events with pagination and date filtering.
+/// </summary>
+
 using FastEndpoints;
 using DotNetCalendarAPI.Models;
 using DotNetCalendarAPI.Models.Requests;
@@ -28,23 +34,20 @@ namespace DotNetCalendarAPI.Endpoints
 
         public override async Task HandleAsync(GetAllEventsRequest req, CancellationToken ct)
         {
-            // Validate and normalize pagination parameters
+            // Cap page size at 100 to prevent performance issues
             req.Page = Math.Max(1, req.Page);
-            req.PageSize = Math.Max(1, Math.Min(100, req.PageSize)); // Cap at 100 for performance
-            
+            req.PageSize = Math.Max(1, Math.Min(100, req.PageSize));
+
             var allEvents = _eventService.GetAllEvents();
-            
-            // Apply date filter if specified
+
             if (req.Date.HasValue)
             {
                 allEvents = allEvents.Where(e => e.Date.Date == req.Date.Value.Date).ToList();
             }
-            
-            // Calculate pagination
+
             var totalCount = allEvents.Count;
             var totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)req.PageSize));
-            
-            // Apply pagination
+
             var events = allEvents
                 .Skip((req.Page - 1) * req.PageSize)
                 .Take(req.PageSize)
@@ -61,8 +64,7 @@ namespace DotNetCalendarAPI.Endpoints
                 HasNext = req.Page < totalPages,
                 HasPrevious = req.Page > 1
             };
-            
-            // Add pagination headers
+
             HttpContext.Response.Headers.Append("X-Total-Count", totalCount.ToString());
             HttpContext.Response.Headers.Append("X-Page", req.Page.ToString());
             HttpContext.Response.Headers.Append("X-Page-Size", req.PageSize.ToString());

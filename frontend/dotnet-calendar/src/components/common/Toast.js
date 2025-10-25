@@ -1,3 +1,9 @@
+/**
+ * @author Tom Butler
+ * @date 2025-10-25
+ * @description Toast notification component with auto-dismiss.
+ */
+
 import React from 'react';
 import { Alert, Snackbar, Slide, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';

@@ -1,3 +1,10 @@
+/// <summary>
+/// Author: Tom Butler
+/// Date: 2025-10-25
+/// Description: FastEndpoint for bulk event creation with validation and error reporting.
+///              Processes up to 100 events per request with individual result tracking.
+/// </summary>
+
 using FastEndpoints;
 using DotNetCalendarAPI.Models.Requests;
 using DotNetCalendarAPI.Models.Responses;
@@ -51,7 +58,6 @@ namespace DotNetCalendarAPI.Endpoints
 
                 try
                 {
-                    // Validate event
                     if (string.IsNullOrEmpty(eventRequest.Title))
                     {
                         result.Success = false;
@@ -62,7 +68,6 @@ namespace DotNetCalendarAPI.Endpoints
 
                     var newEvent = eventRequest.ToEvent();
 
-                    // Check for overlaps
                     if (_eventService.DoesEventOverlap(newEvent))
                     {
                         result.Success = false;
