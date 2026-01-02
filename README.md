@@ -4,6 +4,8 @@ Full-stack calendar application with React frontend and .NET Core backend using 
 
 [Live Demo](https://dotnet-react-calendar.vercel.app) | [API](https://dotnet-react-calendar.onrender.com/api/events)
 
+<img width="1334" height="856" alt="image" src="https://github.com/user-attachments/assets/426abe6e-b316-4f76-b2c2-f11c8d57668a" />
+
 ## Tech Stack
 
 ### Backend
